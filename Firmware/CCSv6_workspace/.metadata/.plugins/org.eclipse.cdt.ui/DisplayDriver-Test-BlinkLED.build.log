@@ -1,0 +1,13 @@
+
+**** Build of configuration Debug for project DisplayDriver-Test-BlinkLED ****
+
+"C:\\ti\\ccsv6\\utils\\bin\\gmake" -k all 
+'Building target: DisplayDriver-Test-BlinkLED.out'
+'Invoking: MSP432 Linker'
+"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.6/bin/armcl" -mv7M4 --code_state=16 --float_support=FPv4SPD16 --abi=eabi -me --advice:power=all -g --gcc --define=__MSP432P401R__ --define=TARGET_IS_MSP432P4XX --define=ccs --diag_warning=225 --display_error_number --diag_wrap=off -z -m"DisplayDriver-Test-BlinkLED.map" --heap_size=1024 --stack_size=512 -i"C:/ti/ccsv6/ccs_base/arm/include" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.6/lib" -i"C:/ti/ccsv6/tools/compiler/ti-cgt-arm_5.2.6/include" --reread_libs --warn_sections --diag_wrap=off --display_error_number --xml_link_info="DisplayDriver-Test-BlinkLED_linkInfo.xml" --rom_model -o "DisplayDriver-Test-BlinkLED.out" "./msp432_startup_ccs.obj" "./msp432p401_1.obj" "../msp432p401r.cmd"  -l"libc.a" 
+<Linking>
+remark #10371-D: (ULP 1.1) Detected no uses of low power mode state changing instructions
+'Finished building target: DisplayDriver-Test-BlinkLED.out'
+' '
+
+**** Build Finished ****

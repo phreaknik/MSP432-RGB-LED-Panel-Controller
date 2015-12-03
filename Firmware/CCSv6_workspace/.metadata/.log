@@ -576,3 +576,25 @@ Command-line arguments:  -os win32 -ws win32 -arch x86 -product com.ti.ccstudio.
 
 !ENTRY org.eclipse.cdt.core 1 0 2015-12-02 19:08:18.687
 !MESSAGE Indexed 'DisplayDriver-Test-HardCodedText' (3 sources, 10 headers) in 0.789 sec: 6,017 declarations; 8,464 references; 0 unresolved inclusions; 1 syntax errors; 0 unresolved names (0%)
+!SESSION 2015-12-02 19:10:31.837 -----------------------------------------------
+eclipse.buildId=4.4.1.M20140925-0400
+java.version=1.7.0_60
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86, WS=win32, NL=en_US
+Framework arguments:  -product com.ti.ccstudio.branding.product
+Command-line arguments:  -os win32 -ws win32 -arch x86 -product com.ti.ccstudio.branding.product
+
+!ENTRY com.ti.common.core 4 0 2015-12-02 19:10:32.828
+!MESSAGE path=ccs_base/DebugServer
+
+!ENTRY com.ti.common.core 4 0 2015-12-02 19:10:32.831
+!MESSAGE debugServerDir=C:/ti/ccsv6/ccs_base/DebugServer
+
+!ENTRY org.eclipse.cdt.core 1 0 2015-12-02 19:10:44.810
+!MESSAGE Indexed 'DisplayDriver-Test-BlinkLED' (2 sources, 9 headers) in 1.93 sec: 5,994 declarations; 8,048 references; 0 unresolved inclusions; 1 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2015-12-02 19:11:00.320
+!MESSAGE Indexed 'DisplayDriver-Test-HardCodedText' (3 sources, 10 headers) in 0.794 sec: 6,017 declarations; 8,464 references; 0 unresolved inclusions; 1 syntax errors; 0 unresolved names (0%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2015-12-02 19:11:16.518
+!MESSAGE Indexed 'DisplayDriver' (3 sources, 18 headers) in 0.883 sec: 6,678 declarations; 9,258 references; 0 unresolved inclusions; 2 syntax errors; 0 unresolved names (0%)
