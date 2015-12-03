@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?ccsproject version="1.0"?>
+<projectOptions>
+	<deviceVariant value="MSP432P401R"/>
+	<deviceFamily value="MSP432"/>
+	<deviceEndianness value="little"/>
+	<codegenToolVersion value="5.2.4"/>
+	<isElfFormat value="true"/>
+	<linkerCommandFile value="msp432p401r.cmd"/>
+	<rts value="libc.a"/>
+	<createSlaveProjects value=""/>
+	<templateProperties value="id=msp432p401_1_MSP432P401R.projectspec.msp432p401_1,"/>
+	<connection value="common/targetdb/connections/TIXDS100v2_Connection.xml"/>
+	<isTargetManual value="false"/>
+	<origin value="C:/Users/John/OneDrive/Documents/CCS/CCSv6_workspace/MSP432_16x32_RGB_Display_HARD_CODED"/>
+</projectOptions>
