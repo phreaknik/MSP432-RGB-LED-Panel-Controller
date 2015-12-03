@@ -35,16 +35,16 @@
 #define DISP__COLOR_DEPTH		4	// depth = 2^N
 
 // Pin Definitions
-#define CtrlDIR				P2DIR
-#define CtrlPort			P2OUT
+#define CtrlDIR					P2DIR
+#define CtrlPort				P2OUT
 
-#define A			BIT0
-#define B			BIT3
-#define C			BIT4
-#define D			BIT5
-#define CLK			BIT1
-#define STB			BIT6
-#define OE			BIT7
+#define A						BIT0
+#define B						BIT3
+#define C						BIT4
+#define D						BIT5
+#define CLK						BIT1
+#define STB						BIT6
+#define OE						BIT7
 
 // Declarations
 typedef struct DISP__imgBuf
@@ -96,9 +96,9 @@ extern void DISP__oneShotFlashTimerISR(void);					// One-shot timer to pulse LED
 extern void DISP__frameTimerISR(void);						// Continuous timer to transmit each frame
 
 extern void DISP__drawLine();
-extern void DISP__drawRect();
+extern void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int height, int width);
 extern void DISP__drawCircle();
-extern void DISP__drawChar(DISP__imgBuf *buf, const char alphNum, const DISP__PDMcolor *PDMColor);
+extern void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *PDMColor, const char alphNum);
 extern void DISP__drawScreen();
 extern void DISP__fillScreen(DISP__imgBuf *buf, const DISP__PDMcolor *PDMColor);
 extern void DISP__setColorPDM(DISP__PDMcolor *PDMcolor, const int32_t red, const int32_t green, const int32_t blue);

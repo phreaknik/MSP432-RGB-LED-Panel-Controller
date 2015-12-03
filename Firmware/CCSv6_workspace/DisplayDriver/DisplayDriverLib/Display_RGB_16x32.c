@@ -382,9 +382,39 @@ void DISP__drawLine()
 
 }
 
-void DISP__drawRect()
+void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int height, int width)
 {
+	// Limit dimensions
+	if(Y > 15) Y = 15;			// Limit Y
+	if(Y < 0) Y = 0;			// Limit Y
+	if(X > 31) X = 31;			// Limit X
+	if(X < 0) X = 0;			// Limit X
+	int Y_lim = Y + height - 1;
+	if(Y_lim > 15) Y_lim = 15;	// Limit height
+	int X_lim = 32 - X - width;
+	if(X_lim < 0) X_lim = 0;	// Limit width
 
+	// Create bar to build rectangle from
+	uint32_t bar = 0;
+	int i;
+	for(i = (31-X); i >= X_lim; i--) bar += BIT(i);
+
+	// Build rectangle from bar
+	int R, P;
+	for(P = 0; P < DISP__COLOR_DEPTH; P++)
+	{
+		for(R = Y; R <= Y_lim; R++)
+		{
+			if(color->red & BIT(P)) buf->redRow[R][P] |= bar;
+			else buf->redRow[R][P] &= ~bar;
+
+			if(color->green & BIT(P)) buf->greenRow[R][P] |= bar;
+			else buf->greenRow[R][P] &= ~bar;
+
+			if(color->blue & BIT(P)) buf->blueRow[R][P] |= bar;
+			else buf->blueRow[R][P] &= ~bar;
+		}
+	}
 }
 
 void DISP__drawCircle()
@@ -392,8 +422,9 @@ void DISP__drawCircle()
 
 }
 
-void DISP__drawChar(DISP__imgBuf *buf, const char alphNum, const DISP__PDMcolor *textColor)
+void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, const char alphNum)
 {
+	// FIXME: Only hardcoded to draw letter 'A'
 	uint32_t letter[DISP__NUM_ROWS];
 	letter[0]	=	0b00100000000000000000000000000000;
 	letter[1]	=	0b01010000000000000000000000000000;
@@ -435,16 +466,16 @@ void DISP__drawScreen(const DISP__imgBuf *buf)
 	DISP__TXBuff = *buf;	//FIXME This should be done with DMA
 }
 
-void DISP__fillScreen(DISP__imgBuf *buf, const DISP__PDMcolor *PDMColor)
+void DISP__fillScreen(DISP__imgBuf *buf, const DISP__PDMcolor *color)
 {
 	int R, P;
 	for(P = 0; P < DISP__COLOR_DEPTH; P++)
 	{
 		for(R = 0; R < DISP__NUM_ROWS; R++)
 		{
-			buf->redRow[R][P] = 		(PDMColor->red & BIT(P)) 	? 	0xFFFFFFFF : 0x00000000;
-			buf->greenRow[R][P] = 		(PDMColor->green & BIT(P)) 	? 	0xFFFFFFFF : 0x00000000;
-			buf->blueRow[R][P] = 		(PDMColor->blue & BIT(P)) 	?	0xFFFFFFFF : 0x00000000;
+			buf->redRow[R][P] = 		(color->red & BIT(P)) 	? 	0xFFFFFFFF : 0x00000000;
+			buf->greenRow[R][P] = 		(color->green & BIT(P)) 	? 	0xFFFFFFFF : 0x00000000;
+			buf->blueRow[R][P] = 		(color->blue & BIT(P)) 	?	0xFFFFFFFF : 0x00000000;
 		}
 	}
 }

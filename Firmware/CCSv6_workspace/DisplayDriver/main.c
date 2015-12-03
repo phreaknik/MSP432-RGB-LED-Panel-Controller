@@ -11,7 +11,7 @@ int main(void) {
 	DISP__imgBuf screenBuff;				// Buffer to build image and send to screen
 	DISP__PDMcolor bgColor;
 	DISP__PDMcolor textColor;
-	int i = 0;
+	DISP__PDMcolor rectColor;
 
 	// Initialize MCU
 	systemInit();
@@ -26,9 +26,11 @@ int main(void) {
 	DISP__setColorPDM(&bgColor, 0, 2, 4);
     DISP__fillScreen(&screenBuff, &bgColor);
 
-    // Draw character
+    // Draw stuff
+	DISP__setColorPDM(&rectColor, 2, 4, 0);
+	DISP__drawRect(&screenBuff, &rectColor, 1, 1, 14, 30);
 	DISP__setColorPDM(&textColor, 4, 0, 0);
-	DISP__drawChar(&screenBuff, "A", &textColor);
+	DISP__drawChar(&screenBuff, &textColor, 'A');
 
 	// Draw screen
 	DISP__drawScreen(&screenBuff);
