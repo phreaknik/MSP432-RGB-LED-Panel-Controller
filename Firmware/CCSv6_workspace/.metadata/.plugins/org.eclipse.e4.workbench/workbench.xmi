@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ASCII"?>
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_ehGLEZlYEeWtA65p_gLSlw" elementId="org.eclipse.e4.legacy.ide.application" contributorURI="platform:/plugin/org.eclipse.ui.workbench" selectedElement="_ehGLEplYEeWtA65p_gLSlw" bindingContexts="_ehGLGJlYEeWtA65p_gLSlw">
-  <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;workbench>&#xD;&#xA;&lt;mruList>&#xD;&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;RGB_Matrix_16x32.c&quot; tooltip=&quot;DisplayTest-HardCodedText/Drivers/RGB_Matrix_16x32.c&quot;>&#xD;&#xA;&lt;persistable path=&quot;/DisplayTest-HardCodedText/Drivers/RGB_Matrix_16x32.c&quot;/>&#xD;&#xA;&lt;/file>&#xD;&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;main.c&quot; tooltip=&quot;DisplayTest-HardCodedText/main.c&quot;>&#xD;&#xA;&lt;persistable path=&quot;/DisplayTest-HardCodedText/main.c&quot;/>&#xD;&#xA;&lt;/file>&#xD;&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;msp432p401_1.c&quot; tooltip=&quot;DisplayControllerTest-BlinkLED/msp432p401_1.c&quot;>&#xD;&#xA;&lt;persistable path=&quot;/DisplayControllerTest-BlinkLED/msp432p401_1.c&quot;/>&#xD;&#xA;&lt;/file>&#xD;&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;main.c&quot; tooltip=&quot;DisplayDriver/main.c&quot;>&#xD;&#xA;&lt;persistable path=&quot;/DisplayDriver/main.c&quot;/>&#xD;&#xA;&lt;/file>&#xD;&#xA;&lt;/mruList>&#xD;&#xA;&lt;/workbench>"/>
+  <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;workbench>&#xD;&#xA;&lt;mruList>&#xD;&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;main.c&quot; tooltip=&quot;DisplayDriver/main.c&quot;>&#xD;&#xA;&lt;persistable path=&quot;/DisplayDriver/main.c&quot;/>&#xD;&#xA;&lt;/file>&#xD;&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;main.c&quot; tooltip=&quot;DisplayDriver-Test-HardCodedText/main.c&quot;>&#xD;&#xA;&lt;persistable path=&quot;/DisplayDriver-Test-HardCodedText/main.c&quot;/>&#xD;&#xA;&lt;/file>&#xD;&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;msp432p401_1.c&quot; tooltip=&quot;DisplayDriver-Test-BlinkLED/msp432p401_1.c&quot;>&#xD;&#xA;&lt;persistable path=&quot;/DisplayDriver-Test-BlinkLED/msp432p401_1.c&quot;/>&#xD;&#xA;&lt;/file>&#xD;&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;RGB_Matrix_16x32.c&quot; tooltip=&quot;DisplayTest-HardCodedText/Drivers/RGB_Matrix_16x32.c&quot;>&#xD;&#xA;&lt;persistable path=&quot;/DisplayTest-HardCodedText/Drivers/RGB_Matrix_16x32.c&quot;/>&#xD;&#xA;&lt;/file>&#xD;&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;main.c&quot; tooltip=&quot;DisplayTest-HardCodedText/main.c&quot;>&#xD;&#xA;&lt;persistable path=&quot;/DisplayTest-HardCodedText/main.c&quot;/>&#xD;&#xA;&lt;/file>&#xD;&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;msp432p401_1.c&quot; tooltip=&quot;DisplayControllerTest-BlinkLED/msp432p401_1.c&quot;>&#xD;&#xA;&lt;persistable path=&quot;/DisplayControllerTest-BlinkLED/msp432p401_1.c&quot;/>&#xD;&#xA;&lt;/file>&#xD;&#xA;&lt;/mruList>&#xD;&#xA;&lt;/workbench>"/>
   <tags>activeSchemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
   <tags>ModelMigrationProcessor.001</tags>
   <children xsi:type="basic:TrimmedWindow" xmi:id="_ehGLEplYEeWtA65p_gLSlw" elementId="IDEWindow" contributorURI="platform:/plugin/org.eclipse.ui.workbench" selectedElement="_ewLI4plYEeWtA65p_gLSlw" label="%trimmedwindow.label.eclipseSDK" x="104" y="104" width="1024" height="768">
@@ -246,13 +246,19 @@
       <tags>categoryTag:Help</tags>
     </sharedElements>
     <sharedElements xsi:type="advanced:Area" xmi:id="_ey8JAJlYEeWtA65p_gLSlw" elementId="org.eclipse.ui.editorss" selectedElement="_ey8JAZlYEeWtA65p_gLSlw">
-      <children xsi:type="basic:PartStack" xmi:id="_ey8JAZlYEeWtA65p_gLSlw" elementId="org.eclipse.e4.primaryDataStack">
+      <children xsi:type="basic:PartStack" xmi:id="_ey8JAZlYEeWtA65p_gLSlw" elementId="org.eclipse.e4.primaryDataStack" selectedElement="_w8DYkJlaEeW-p-swr1WN2w">
         <tags>newtablook</tags>
         <tags>org.eclipse.e4.primaryDataStack</tags>
         <tags>EditorStack</tags>
         <tags>Maximized</tags>
         <tags>noFocus</tags>
         <children xsi:type="advanced:Placeholder" xmi:id="_ezNOwJlYEeWtA65p_gLSlw" elementId="org.eclipse.ui.internal.introview" toBeRendered="false" ref="_ewLI4JlYEeWtA65p_gLSlw"/>
+        <children xsi:type="basic:Part" xmi:id="_w8DYkJlaEeW-p-swr1WN2w" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="main.c" iconURI="platform:/plugin/org.eclipse.cdt.ui/icons/obj16/c_file_obj.gif" closeable="true">
+          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;editor id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;main.c&quot; partName=&quot;main.c&quot; title=&quot;main.c&quot; tooltip=&quot;DisplayDriver/main.c&quot;>&#xD;&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/DisplayDriver/main.c&quot;/>&#xD;&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;140&quot; selectionTopPixel=&quot;120&quot;/>&#xD;&#xA;&lt;/editor>"/>
+          <tags>Editor</tags>
+          <tags>org.eclipse.cdt.ui.editor.CEditor</tags>
+          <tags>removeOnHide</tags>
+        </children>
       </children>
     </sharedElements>
     <sharedElements xsi:type="basic:Part" xmi:id="_ezKygJlYEeWtA65p_gLSlw" elementId="org.eclipse.ui.navigator.ProjectExplorer" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Project Explorer" iconURI="platform:/plugin/org.eclipse.ui.navigator.resources/icons/full/eview16/resource_persp.gif" closeable="true">
@@ -371,7 +377,7 @@
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_exO40JlYEeWtA65p_gLSlw" elementId="org.eclipse.ui.workbench.file">
         <tags>Draggable</tags>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_OKHqtplaEeWSdp4GfKKyRw" elementId="print" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/print_edit.png" tooltip="Print" command="_ehdXwZlYEeWtA65p_gLSlw"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_p9Ai1plaEeW-p-swr1WN2w" elementId="print" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/print_edit.png" tooltip="Print" command="_ehdXwZlYEeWtA65p_gLSlw"/>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_exO40ZlYEeWtA65p_gLSlw" elementId="additions" toBeRendered="false">
         <tags>toolbarSeparator</tags>
@@ -402,9 +408,9 @@
         <tags>toolbarSeparator</tags>
         <children xsi:type="menu:ToolBarSeparator" xmi:id="_exO41JlYEeWtA65p_gLSlw" elementId="group.nav" toBeRendered="false"/>
       </children>
-      <children xsi:type="menu:ToolBar" xmi:id="_exO41ZlYEeWtA65p_gLSlw" elementId="org.eclipse.ui.workbench.navigate">
+      <children xsi:type="menu:ToolBar" xmi:id="_exO41ZlYEeWtA65p_gLSlw" elementId="org.eclipse.ui.workbench.navigate" visible="false">
         <tags>Draggable</tags>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_OKKuAplaEeWSdp4GfKKyRw" elementId="org.eclipse.ui.window.pinEditor" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/pin_editor.png" tooltip="Pin Editor" type="Check" command="_ehaUP5lYEeWtA65p_gLSlw"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_p9C_FZlaEeW-p-swr1WN2w" elementId="org.eclipse.ui.window.pinEditor" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/pin_editor.png" tooltip="Pin Editor" type="Check" command="_ehaUP5lYEeWtA65p_gLSlw"/>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_exPf4JlYEeWtA65p_gLSlw" elementId="group.editor" toBeRendered="false">
         <tags>toolbarSeparator</tags>
