@@ -31,8 +31,7 @@
 // Display parameters
 #define DISP__NUM_ROWS			16
 #define	DISP__NUM_COLUMNS		32
-#define	DISP__COLOR_BITS		2	// Bits = N
-#define DISP__COLOR_DEPTH		4	// depth = 2^N
+#define DISP__COLOR_DEPTH		8		// Number of PDM Pulses per color
 
 // Pin Definitions
 #define CtrlDIR					P2DIR
