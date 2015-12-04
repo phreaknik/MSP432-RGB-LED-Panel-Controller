@@ -47,6 +47,6 @@ Temporary Items
 .apdisk
 *.launch
 *.prefs
-.metadata/
 .RemoteSystemsTempFiles/
+.metadata/
 Debug/
