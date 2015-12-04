@@ -1,7 +1,7 @@
 #include "msp.h"
 #include <stdint.h>
 
-#include "DisplayDriverLib/Display_RGB_16x32.h"
+#include "RGB-LED-Panel-Library/RGB_LED_Panel.h"
 
 // Function declarations
 void systemInit();
@@ -11,7 +11,7 @@ int main(void) {
 	DISP__imgBuf screenBuff;				// Buffer to build image and send to screen
 	DISP__PDMcolor bgColor;
 	DISP__PDMcolor textColor;
-	int i = 0;
+	DISP__PDMcolor rectColor;
 
 	// Initialize MCU
 	systemInit();
@@ -26,9 +26,11 @@ int main(void) {
 	DISP__setColorPDM(&bgColor, 0, 2, 4);
     DISP__fillScreen(&screenBuff, &bgColor);
 
-    // Draw character
-	DISP__setColorPDM(&textColor, 4, 0, 0);
-	DISP__drawChar(&screenBuff, "A", &textColor);
+    // Draw stuff
+	DISP__setColorPDM(&rectColor, 8, 3, 3);
+	DISP__drawRect(&screenBuff, &rectColor, 1, 1, 14, 30);
+	DISP__setColorPDM(&textColor, 0, 8, 2);
+	DISP__drawChar(&screenBuff, &textColor, 'A');
 
 	// Draw screen
 	DISP__drawScreen(&screenBuff);

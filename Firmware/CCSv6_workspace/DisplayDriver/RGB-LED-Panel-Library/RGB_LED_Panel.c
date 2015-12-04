@@ -1,10 +1,10 @@
 /*
- * Display_RGB_16x32.c
+ * RGB_LED_Panel.c
  *
  *  Created on: Apr 16, 2015
  *      Author: phreaknik
  *      Description:
- *      	The Display_RGB_16x32 code serves as a driver for the TI MSP432 to drive the SparkFun/Adafruit 16x32
+ *      	The RGB_LED_Panel code serves as a driver for the TI MSP432 to drive the SparkFun/Adafruit 16x32
  *      	RGB LED display. This driver uses timer interrupts and eUSCI modules to offload most of the processing
  *      	requirements from the host CPU. Some MSP432 peripherals will be in use by this driver and will be
  *      	unavailable for other processes. Below is a list of the used peripherals.
@@ -20,7 +20,7 @@
  *      		- TimerA1
  */
 
-#include "../DisplayDriverLib/Display_RGB_16x32.h"
+#include "../RGB-LED-Panel-Library/RGB_LED_Panel.h"
 
 #include "msp.h"
 
@@ -382,9 +382,39 @@ void DISP__drawLine()
 
 }
 
-void DISP__drawRect()
+void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int height, int width)
 {
+	// Limit dimensions
+	if(Y > 15) Y = 15;			// Limit Y
+	if(Y < 0) Y = 0;			// Limit Y
+	if(X > 31) X = 31;			// Limit X
+	if(X < 0) X = 0;			// Limit X
+	int Y_lim = Y + height - 1;
+	if(Y_lim > 15) Y_lim = 15;	// Limit height
+	int X_lim = 32 - X - width;
+	if(X_lim < 0) X_lim = 0;	// Limit width
 
+	// Create bar to build rectangle from
+	uint32_t bar = 0;
+	int i;
+	for(i = (31-X); i >= X_lim; i--) bar += BIT(i);
+
+	// Build rectangle from bar
+	int R, P;
+	for(P = 0; P < DISP__COLOR_DEPTH; P++)
+	{
+		for(R = Y; R <= Y_lim; R++)
+		{
+			if(color->red & BIT(P)) buf->redRow[R][P] |= bar;
+			else buf->redRow[R][P] &= ~bar;
+
+			if(color->green & BIT(P)) buf->greenRow[R][P] |= bar;
+			else buf->greenRow[R][P] &= ~bar;
+
+			if(color->blue & BIT(P)) buf->blueRow[R][P] |= bar;
+			else buf->blueRow[R][P] &= ~bar;
+		}
+	}
 }
 
 void DISP__drawCircle()
@@ -392,8 +422,9 @@ void DISP__drawCircle()
 
 }
 
-void DISP__drawChar(DISP__imgBuf *buf, const char alphNum, const DISP__PDMcolor *textColor)
+void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, const char alphNum)
 {
+	// FIXME: Only hardcoded to draw letter 'A'
 	uint32_t letter[DISP__NUM_ROWS];
 	letter[0]	=	0b00100000000000000000000000000000;
 	letter[1]	=	0b01010000000000000000000000000000;
@@ -435,21 +466,21 @@ void DISP__drawScreen(const DISP__imgBuf *buf)
 	DISP__TXBuff = *buf;	//FIXME This should be done with DMA
 }
 
-void DISP__fillScreen(DISP__imgBuf *buf, const DISP__PDMcolor *PDMColor)
+void DISP__fillScreen(DISP__imgBuf *buf, const DISP__PDMcolor *color)
 {
 	int R, P;
 	for(P = 0; P < DISP__COLOR_DEPTH; P++)
 	{
 		for(R = 0; R < DISP__NUM_ROWS; R++)
 		{
-			buf->redRow[R][P] = 		(PDMColor->red & BIT(P)) 	? 	0xFFFFFFFF : 0x00000000;
-			buf->greenRow[R][P] = 		(PDMColor->green & BIT(P)) 	? 	0xFFFFFFFF : 0x00000000;
-			buf->blueRow[R][P] = 		(PDMColor->blue & BIT(P)) 	?	0xFFFFFFFF : 0x00000000;
+			buf->redRow[R][P] = 		(color->red & BIT(P)) 	? 	0xFFFFFFFF : 0x00000000;
+			buf->greenRow[R][P] = 		(color->green & BIT(P)) 	? 	0xFFFFFFFF : 0x00000000;
+			buf->blueRow[R][P] = 		(color->blue & BIT(P)) 	?	0xFFFFFFFF : 0x00000000;
 		}
 	}
 }
 
-void DISP__setColorPDM(DISP__PDMcolor *PDMColor, const int32_t red, const int32_t green, const int32_t blue)
+void DISP__setColorPDM(DISP__PDMcolor *PDMColor, int red, int green, int blue)
 {
 	// First, clear colors
 	PDMColor->red = 0;
@@ -460,10 +491,18 @@ void DISP__setColorPDM(DISP__PDMcolor *PDMColor, const int32_t red, const int32_
 	// This prevents wasting CPU cycles on blank pixels
 	if(!(red || green || blue)) return;
 
-	int32_t i = 0,
-			redError = 0,
-			greenError = 0,
-			blueError = 0;
+	// Limit color values
+	if(red >= DISP__COLOR_DEPTH) red = DISP__COLOR_DEPTH;
+	if(red < 0) red = 0;
+	if(green >= DISP__COLOR_DEPTH) green = DISP__COLOR_DEPTH;
+	if(green < 0) green = 0;
+	if(blue >= DISP__COLOR_DEPTH) blue = DISP__COLOR_DEPTH;
+	if(blue < 0) blue = 0;
+
+	int i = 0,
+		redError = 0,
+		greenError = 0,
+		blueError = 0;
 
 	// Perform PDM modulation
 	for(i=0; i < DISP__COLOR_DEPTH; i++)
