@@ -480,7 +480,7 @@ void DISP__fillScreen(DISP__imgBuf *buf, const DISP__PDMcolor *color)
 	}
 }
 
-void DISP__setColorPDM(DISP__PDMcolor *PDMColor, const int32_t red, const int32_t green, const int32_t blue)
+void DISP__setColorPDM(DISP__PDMcolor *PDMColor, int red, int green, int blue)
 {
 	// First, clear colors
 	PDMColor->red = 0;
@@ -491,10 +491,18 @@ void DISP__setColorPDM(DISP__PDMcolor *PDMColor, const int32_t red, const int32_
 	// This prevents wasting CPU cycles on blank pixels
 	if(!(red || green || blue)) return;
 
-	int32_t i = 0,
-			redError = 0,
-			greenError = 0,
-			blueError = 0;
+	// Limit color values
+	if(red >= DISP__COLOR_DEPTH) red = DISP__COLOR_DEPTH;
+	if(red < 0) red = 0;
+	if(green >= DISP__COLOR_DEPTH) green = DISP__COLOR_DEPTH;
+	if(green < 0) green = 0;
+	if(blue >= DISP__COLOR_DEPTH) blue = DISP__COLOR_DEPTH;
+	if(blue < 0) blue = 0;
+
+	int i = 0,
+		redError = 0,
+		greenError = 0,
+		blueError = 0;
 
 	// Perform PDM modulation
 	for(i=0; i < DISP__COLOR_DEPTH; i++)
