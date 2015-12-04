@@ -1,7 +1,7 @@
 #include "msp.h"
 #include <stdint.h>
 
-#include "DisplayDriverLib/Display_RGB_16x32.h"
+#include "RGB-LED-Panel-Library/RGB_LED_Panel.h"
 
 // Function declarations
 void systemInit();
