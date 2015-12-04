@@ -1,0 +1,3 @@
+[submodule "Firmware/CCSv6_workspace/DisplayDriver/RGB-LED-Panel-Library"]
+	path = Firmware/CCSv6_workspace/DisplayDriver/RGB-LED-Panel-Library
+	url = git@github.com:phreaknik/RGB-LED-Panel-Library.git
