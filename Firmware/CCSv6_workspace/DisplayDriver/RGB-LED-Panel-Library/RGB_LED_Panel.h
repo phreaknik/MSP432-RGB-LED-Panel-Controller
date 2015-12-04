@@ -95,7 +95,7 @@ extern void DISP__oneShotFlashTimerISR(void);					// One-shot timer to pulse LED
 extern void DISP__frameTimerISR(void);						// Continuous timer to transmit each frame
 
 extern void DISP__drawLine();
-extern void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int height, int width);
+extern void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int width, int height);
 extern void DISP__drawCircle();
 extern void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, const char alphNum, int X, int Y);
 extern void DISP__drawScreen();

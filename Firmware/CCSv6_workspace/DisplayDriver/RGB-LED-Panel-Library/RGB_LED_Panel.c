@@ -383,13 +383,21 @@ void DISP__drawLine()
 
 }
 
-void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int height, int width)
+void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int width, int height)
 {
 	// Limit dimensions
-	if(Y > 15) Y = 15;			// Limit Y
-	if(Y < 0) Y = 0;			// Limit Y
-	if(X > 31) X = 31;			// Limit X
-	if(X < 0) X = 0;			// Limit X
+	if(Y > 15) return;			// Rectangle is off screen, so nothing to draw
+	if(Y < 0)
+	{
+		height += Y;			// Reduce height to simulate drawing off screen
+		Y = 0;					// Limit Y
+	}
+	if(X > 31) return;			// Rectangle is off screen, so nothing to draw
+	if(X < 0)
+	{
+		width += X;				// Reduce width to simulate drawing off screen
+		X = 0;					// Limit X
+	}
 	int Y_lim = Y + height - 1;
 	if(Y_lim > 15) Y_lim = 15;	// Limit height
 	int X_lim = 32 - X - width;
