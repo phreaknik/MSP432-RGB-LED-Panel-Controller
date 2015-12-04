@@ -30,7 +30,7 @@ int main(void) {
 	DISP__setColorPDM(&rectColor, 8, 3, 3);
 	DISP__drawRect(&screenBuff, &rectColor, 1, 1, 14, 30);
 	DISP__setColorPDM(&textColor, 0, 8, 2);
-	DISP__drawChar(&screenBuff, &textColor, 'A');
+	DISP__drawChar(&screenBuff, &textColor, 'A', 0, 0);
 
 	// Draw screen
 	DISP__drawScreen(&screenBuff);
