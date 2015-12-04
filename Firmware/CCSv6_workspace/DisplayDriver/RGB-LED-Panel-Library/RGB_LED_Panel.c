@@ -21,6 +21,7 @@
  */
 
 #include "../RGB-LED-Panel-Library/RGB_LED_Panel.h"
+#include "../RGB-LED-Panel-Library/char_map.h"
 
 #include "msp.h"
 
@@ -422,40 +423,29 @@ void DISP__drawCircle()
 
 }
 
-void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, const char alphNum)
+void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, char alphNum, int X, int Y)
 {
-	// FIXME: Only hardcoded to draw letter 'A'
-	uint32_t letter[DISP__NUM_ROWS];
-	letter[0]	=	0b00100000000000000000000000000000;
-	letter[1]	=	0b01010000000000000000000000000000;
-	letter[2]	=	0b10001000000000000000000000000000;
-	letter[3]	=	0b10001000000000000000000000000000;
-	letter[4]	=	0b11111000000000000000000000000000;
-	letter[5]	=	0b10001000000000000000000000000000;
-	letter[6]	=	0b10001000000000000000000000000000;
-	letter[7]	=	0b00000000000000000000000000000000;
-	letter[8]	=	0b00000000000000000000000000000000;
-	letter[9]	=	0b00000000000000000000000000000000;
-	letter[10]	=	0b00000000000000000000000000000000;
-	letter[11]	=	0b00000000000000000000000000000000;
-	letter[12]	=	0b00000000000000000000000000000000;
-	letter[13]	=	0b00000000000000000000000000000000;
-	letter[14]	=	0b00000000000000000000000000000000;
-	letter[15]	=	0b00000000000000000000000000000000;
+	// Limit X & Y range
+	if(X > 31) 	X = 31;
+	if(X < 0)	X = 0;
+	if(Y > 15) 	Y = 15;
+	if(Y < 0)	Y = 0;
+	// Shift ASCII value to match charMap, since charMap starts at the 32nd ASCII value
+	alphNum -= 32;
 
 	int R, P;
 	for(P = 0; P < DISP__COLOR_DEPTH; P++)
 	{
-		for(R = 0; R < DISP__NUM_ROWS; R++)
+		for(R = 0; R < 7; R++)
 		{
-			if(textColor->red & BIT(P)) buf->redRow[R][P] |= letter[R];
-			else buf->redRow[R][P] &= ~letter[R];
+			if(textColor->red & BIT(P)) buf->redRow[Y + R][P] |= (unsigned) (charMap[alphNum][R] >> X);
+			else buf->redRow[Y + R][P] &= ~((unsigned) (charMap[alphNum][R] >> X));
 
-			if(textColor->green & BIT(P)) buf->greenRow[R][P] |= letter[R];
-			else buf->greenRow[R][P] &= ~letter[R];
+			if(textColor->green & BIT(P)) buf->greenRow[Y + R][P] |= (unsigned) (charMap[alphNum][R] >> X);
+			else buf->greenRow[Y + R][P] &= ~((unsigned) (charMap[alphNum][R] >> X));
 
-			if(textColor->blue & BIT(P)) buf->blueRow[R][P] |= letter[R];
-			else buf->blueRow[R][P] &= ~letter[R];
+			if(textColor->blue & BIT(P)) buf->blueRow[Y + R][P] |= (unsigned) (charMap[alphNum][R] >> X);
+			else buf->blueRow[Y + R][P] &= ~((unsigned) (charMap[alphNum][R] >> X));
 		}
 	}
 
@@ -474,7 +464,7 @@ void DISP__fillScreen(DISP__imgBuf *buf, const DISP__PDMcolor *color)
 		for(R = 0; R < DISP__NUM_ROWS; R++)
 		{
 			buf->redRow[R][P] = 		(color->red & BIT(P)) 	? 	0xFFFFFFFF : 0x00000000;
-			buf->greenRow[R][P] = 		(color->green & BIT(P)) 	? 	0xFFFFFFFF : 0x00000000;
+			buf->greenRow[R][P] = 		(color->green & BIT(P)) ? 	0xFFFFFFFF : 0x00000000;
 			buf->blueRow[R][P] = 		(color->blue & BIT(P)) 	?	0xFFFFFFFF : 0x00000000;
 		}
 	}
