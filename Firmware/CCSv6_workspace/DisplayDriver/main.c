@@ -27,7 +27,7 @@ int main(void) {
 
     // Draw stuff
 	DISP__setColorPDM(&textColor, 0, 8, 2);
-	DISP__drawChar(&screenBuff, &textColor, '~', 12, 4);
+	DISP__drawChar(&screenBuff, &textColor, '&', 12, 4);
 
 	// Draw screen
 	DISP__drawScreen(&screenBuff);
