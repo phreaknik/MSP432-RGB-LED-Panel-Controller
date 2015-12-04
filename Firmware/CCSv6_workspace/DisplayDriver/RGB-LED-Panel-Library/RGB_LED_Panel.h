@@ -20,8 +20,8 @@
  *      		- TimerA1
  */
 
-#ifndef DISPLAY_RGB_16X32_H_
-#define DISPLAY_RGB_16X32_H_
+#ifndef RGB_LED_PANEL_H_
+#define RGB_LED_PANEL_H_
 
 // Includes
 #include <stdint.h>
@@ -97,9 +97,9 @@ extern void DISP__frameTimerISR(void);						// Continuous timer to transmit each
 extern void DISP__drawLine();
 extern void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int height, int width);
 extern void DISP__drawCircle();
-extern void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *PDMColor, const char alphNum);
+extern void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, const char alphNum, int X, int Y);
 extern void DISP__drawScreen();
 extern void DISP__fillScreen(DISP__imgBuf *buf, const DISP__PDMcolor *PDMColor);
 extern void DISP__setColorPDM(DISP__PDMcolor *PDMcolor, const int32_t red, const int32_t green, const int32_t blue);
 
-#endif /* DISPLAY_RGB_16X32_H_ */
+#endif /* RGB_LED_PANEL_H_ */
