@@ -23,8 +23,6 @@
 #include "../RGB-LED-Panel-Library/RGB_LED_Panel.h"
 #include "../RGB-LED-Panel-Library/char_map.h"
 
-#include "msp.h"
-
 
 // Global variables
 DISP__imgBuf DISP__TXBuff;				// TXBuffer to hold screen data to be sent to display
@@ -386,13 +384,13 @@ void DISP__drawLine()
 void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int width, int height)
 {
 	// Limit dimensions
-	if(Y > 15) return;			// Rectangle is off screen, so nothing to draw
+	if(Y > (DISP__NUM_ROWS - 1) || (Y + height) < 0) return;			// Rectangle is off screen, so nothing to draw
+	if(X > (DISP__NUM_COLUMNS - 1) || (X + width) < 0) return;			// Rectangle is off screen, so nothing to draw
 	if(Y < 0)
 	{
 		height += Y;			// Reduce height to simulate drawing off screen
 		Y = 0;					// Limit Y
 	}
-	if(X > 31) return;			// Rectangle is off screen, so nothing to draw
 	if(X < 0)
 	{
 		width += X;				// Reduce width to simulate drawing off screen
@@ -426,9 +424,52 @@ void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y
 	}
 }
 
-void DISP__drawCircle()
+void DISP__drawCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int radius)
 {
+	// Local variables
+	uint32_t bar = 0;
+	float half_pi = 1.57079632679;
+	float xOffset = 0;
+	int xLow = 0;
+	int xHigh = 0;
 
+	// Take absolute value of radius
+	if (radius < 0) radius = 0 - radius;	// Efficient absolute value
+
+	// Limit dimensions
+	if((Y - radius > (DISP__NUM_ROWS - 1)) || (Y + radius < 0)) return;			// Circle is completely off screen, so nothing to draw
+	if((X - radius > (DISP__NUM_COLUMNS - 1)) || (X + radius < 0)) return;			// Circle is completely off screen, so nothing to draw
+
+	// Build rectangle from bar
+	int R, P;
+	for(P = 0; P < DISP__COLOR_DEPTH; P++)
+	{
+		for(R = Y; R <= Y + radius; R++)
+		{
+			// Create bar to draw
+			xOffset = R - Y;
+			xOffset /= (float) radius;
+			xOffset = cos(xOffset * half_pi);
+			xOffset *= (float) R;
+			xOffset = round(xOffset);	// Round to nearest integer
+			xLow = X - xOffset;
+			xHigh = X + xOffset;
+
+			// Set pixel of bar only if pixel is on screen
+			if( !((xLow < 0) || (xLow > DISP__NUM_COLUMNS)) )	bar = BIT(xLow);
+			if( !((xHigh < 0) || (xHigh > DISP__NUM_COLUMNS)) )	bar |= BIT(xHigh);
+
+			// Now draw bar
+			if(color->red & BIT(P)) buf->redRow[R][P] |= bar;
+			else buf->redRow[R][P] &= ~bar;
+
+			if(color->green & BIT(P)) buf->greenRow[R][P] |= bar;
+			else buf->greenRow[R][P] &= ~bar;
+
+			if(color->blue & BIT(P)) buf->blueRow[R][P] |= bar;
+			else buf->blueRow[R][P] &= ~bar;
+		}
+	}
 }
 
 void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, char alphNum, int X, int Y)
