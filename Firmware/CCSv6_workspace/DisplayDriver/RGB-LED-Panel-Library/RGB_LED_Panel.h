@@ -24,6 +24,7 @@
 #define RGB_LED_PANEL_H_
 
 // Includes
+#include "msp.h"
 #include <stdint.h>
 #include <math.h>
 #include <assert.h>
@@ -96,7 +97,7 @@ extern void DISP__frameTimerISR(void);						// Continuous timer to transmit each
 
 extern void DISP__drawLine();
 extern void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int width, int height);
-extern void DISP__drawCircle();
+extern void DISP__drawCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int radius);
 extern void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, const char alphNum, int X, int Y);
 extern void DISP__drawScreen();
 extern void DISP__fillScreen(DISP__imgBuf *buf, const DISP__PDMcolor *PDMColor);
