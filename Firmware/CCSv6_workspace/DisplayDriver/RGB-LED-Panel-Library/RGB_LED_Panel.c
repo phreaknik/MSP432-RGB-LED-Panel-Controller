@@ -428,7 +428,7 @@ void DISP__drawCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int
 {
 	// Local variables
 	uint32_t bar = 0;
-	float half_pi = 1.57079632679;
+	float pi = 3.14159265359;
 	float xOffset = 0;
 	int xLow = 0;
 	int xHigh = 0;
@@ -449,19 +449,27 @@ void DISP__drawCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int
 			// Create bar to draw
 			xOffset = R - Y;
 			xOffset /= (float) radius;
-			xOffset = cos(xOffset * half_pi);
+			xOffset = cos(xOffset * pi);
 			xOffset *= (float) R;
 			xOffset = round(xOffset);	// Round to nearest integer
 			xLow = X - xOffset;
 			xHigh = X + xOffset;
 
 			// Set pixel of bar only if pixel is on screen
-			if( !((xLow < 0) || (xLow > DISP__NUM_COLUMNS)) )	bar = BIT(xLow);
-			if( !((xHigh < 0) || (xHigh > DISP__NUM_COLUMNS)) )	bar |= BIT(xHigh);
+			if( !((xLow < 0) || (xLow > DISP__NUM_COLUMNS)) )	bar = 0xFFFFFFFF >> xLow;
+			if( !((xHigh < 0) || (xHigh > DISP__NUM_COLUMNS)) )	bar &= ~(0xFFFFFFFF >> xHigh);
 
 			// Now draw bar
-			if(color->red & BIT(P)) buf->redRow[R][P] |= bar;
-			else buf->redRow[R][P] &= ~bar;
+			if(color->red & BIT(P))
+			{
+				FIXME: Add code to draw top haf of circle at same time as bottom half
+				buf->redRow[R][P] |= bar;
+				buf->redRow[R][P] |= bar;
+			}
+			else
+			{
+				buf->redRow[R][P] &= ~bar;
+			}
 
 			if(color->green & BIT(P)) buf->greenRow[R][P] |= bar;
 			else buf->greenRow[R][P] &= ~bar;
