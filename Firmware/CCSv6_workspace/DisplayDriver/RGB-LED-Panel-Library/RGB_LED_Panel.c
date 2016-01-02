@@ -831,22 +831,24 @@ void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, char alp
 	if(X < 0)	X = 0;
 	if(Y >= DISP__NUM_ROWS) 	Y = DISP__NUM_ROWS - 1;
 	if(Y < 0)	Y = 0;
+
 	// Shift ASCII value to match charMap, since charMap starts at the 32nd ASCII value
 	alphNum -= 32;
 
 	int R, P;
 	for(P = 0; P < DISP__COLOR_DEPTH; P++)
 	{
-		for(R = 0; R < 7; R++)
+		for(R = Y; R < Y + 7; R++)
 		{
-			if(textColor->red & BIT(P)) buf->redRow[Y + R][P] |= (unsigned) (charMap[alphNum][R] >> X);
-			else buf->redRow[Y + R][P] &= ~((unsigned) (charMap[alphNum][R] >> X));
+			int index = R - Y;
+			if(textColor->red & BIT(P)) buf->redRow[R][P] |= (unsigned) (charMap[alphNum][index] << (DISP__NUM_COLUMNS - X - 5));
+			else buf->redRow[R][P] &= ~((unsigned) (charMap[alphNum][index] << (DISP__NUM_COLUMNS - X - 5)));
 
-			if(textColor->green & BIT(P)) buf->greenRow[Y + R][P] |= (unsigned) (charMap[alphNum][R] >> X);
-			else buf->greenRow[Y + R][P] &= ~((unsigned) (charMap[alphNum][R] >> X));
+			if(textColor->green & BIT(P)) buf->greenRow[R][P] |= (unsigned) (charMap[alphNum][index] << (DISP__NUM_COLUMNS - X - 5));
+			else buf->greenRow[R][P] &= ~((unsigned) (charMap[alphNum][index] << (DISP__NUM_COLUMNS - X - 5)));
 
-			if(textColor->blue & BIT(P)) buf->blueRow[Y + R][P] |= (unsigned) (charMap[alphNum][R] >> X);
-			else buf->blueRow[Y + R][P] &= ~((unsigned) (charMap[alphNum][R] >> X));
+			if(textColor->blue & BIT(P)) buf->blueRow[R][P] |= (unsigned) (charMap[alphNum][index] << (DISP__NUM_COLUMNS - X - 5));
+			else buf->blueRow[R][P] &= ~((unsigned) (charMap[alphNum][index] << (DISP__NUM_COLUMNS - X - 5)));
 		}
 	}
 
