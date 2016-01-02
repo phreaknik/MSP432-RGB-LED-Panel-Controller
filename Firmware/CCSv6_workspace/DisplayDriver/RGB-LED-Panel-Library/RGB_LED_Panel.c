@@ -670,6 +670,99 @@ void DISP__drawCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int
 		f += ddF_x;
 
 		// Create bars to draw
+		bary = BIT(DISP__NUM_COLUMNS - X - x - 1) + BIT(DISP__NUM_COLUMNS - X + x - 2);
+		barx = BIT(DISP__NUM_COLUMNS - X - y - 1) + BIT(DISP__NUM_COLUMNS - X + y - 2);
+
+		// Set indices
+		int Ypy = Y + y;
+		int Ymy = Y - y + 1;
+		int Ypx = Y + x;
+		int Ymx = Y - x + 1;
+		// Now draw bars
+		for(P = 0; P < DISP__COLOR_DEPTH; P++)
+		{
+			if(color->red & BIT(P))
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->redRow[Ypy][P] |= bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->redRow[Ymy][P] |= bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->redRow[Ypx][P] |= barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->redRow[Ymx][P] |= barx;
+			}
+			else
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->redRow[Ypy][P] &= ~bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->redRow[Ymy][P] &= ~bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->redRow[Ypx][P] &= ~barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->redRow[Ymx][P] &= ~barx;
+			}
+
+			if(color->green & BIT(P))
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->greenRow[Ypy][P] |= bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->greenRow[Ymy][P] |= bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->greenRow[Ypx][P] |= barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->greenRow[Ymx][P] |= barx;
+			}
+			else
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->greenRow[Ypy][P] &= ~bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->greenRow[Ymy][P] &= ~bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->greenRow[Ypx][P] &= ~barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->greenRow[Ymx][P] &= ~barx;
+			}
+
+			if(color->blue & BIT(P))
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->blueRow[Ypy][P] |= bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->blueRow[Ymy][P] |= bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->blueRow[Ypx][P] |= barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->blueRow[Ymx][P] |= barx;
+			}
+			else
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->blueRow[Ypy][P] &= ~bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->blueRow[Ymy][P] &= ~bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->blueRow[Ypx][P] &= ~barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->blueRow[Ymx][P] &= ~barx;
+			}
+		}
+	}
+}
+
+void DISP__fillCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int radius)
+{
+	// Local variables
+	uint32_t barx, bary;
+	int f, ddF_x, ddF_y, x, y, P;
+
+	// Take absolute value of radius
+	if (radius < 0) radius = 0 - radius;	// Efficient absolute value
+
+	// Initialize variables
+	f = 1 - radius;
+	ddF_x = 1;
+	ddF_y = -2 * radius;
+	x = 0;
+	y = radius;
+
+	// Limit dimensions
+	if((Y - radius > (DISP__NUM_ROWS - 1)) || (Y + radius < 0)) return;			// Circle is completely off screen, so nothing to draw
+	if((X - radius > (DISP__NUM_COLUMNS - 1)) || (X + radius < 0)) return;			// Circle is completely off screen, so nothing to draw
+
+	// Build circle from bar
+	while(x<y)
+	{
+		if(f >= 0)
+		{
+			y--;
+			ddF_y += 2;
+			f += ddF_y;
+		}
+		x++;
+		ddF_x += 2;
+		f += ddF_x;
+
+		// Create bars to draw
 		bary = 0xFFFFFFFF & ~(0xFFFFFFFF >> X + x + 1);
 		bary &= ~(0xFFFFFFFF << (DISP__NUM_COLUMNS - X + x - 1));
 		barx = 0xFFFFFFFF & ~(0xFFFFFFFF >> X + y + 1);
