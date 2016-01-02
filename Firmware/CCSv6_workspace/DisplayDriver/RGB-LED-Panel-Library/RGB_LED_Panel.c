@@ -385,7 +385,7 @@ void DISP__drawLine(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X0, int 
 	if(X0 < 0 && X1 < 0) return;			// Line is off screen, so nothing to draw
 
 	// Bresenham's Line Algorithm (https://en.wikipedia.org/wiki/Bresenham's_line_algorithm)
-	int steep = fabs(Y1 - Y0)/fabs(X1 - X0);
+	int steep = fabs(Y1 - Y0) > fabs(X1 - X0);
 	if(steep)
 	{
 		// Swap X0 and Y0
@@ -419,30 +419,70 @@ void DISP__drawLine(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X0, int 
 	ystep = (Y0 < Y1) ? 1 : -1;
 
 	// Draw to screenBuf
-	int R, P;
-	uint32_t bar = 0;
-	for(; X0 <= X1; X0++)
+	if(steep)
 	{
-		bar |= (steep) ? BIT(DISP__NUM_COLUMNS - Y0 - 1) : BIT(DISP__NUM_COLUMNS - X0 - 1);
-		err -= dy;
-		if((err < 0) || (X0 == X1))
+		int R, P, oldR;
+		uint32_t bar = 0;
+		oldR = X0;
+		for(; X0 <= X1; X0++)
 		{
-			R = (steep) ? X0 : Y0;
-			for(P = 0; P < DISP__COLOR_DEPTH; P++)
+			bar |= BIT(DISP__NUM_COLUMNS - Y0 - 1);
+			err -= dy;
+			if((err < 0) || (X0 == X1))
 			{
-				if(color->red & BIT(P)) buf->redRow[R][P] |= bar;
-				else buf->redRow[R][P] &= ~bar;
+				for(R = oldR; R <= X0; R++)
+				{
+					if((R >= 0) && (R < DISP__NUM_ROWS))
+					{
+						for(P = 0; P < DISP__COLOR_DEPTH; P++)
+						{
+							if(color->red & BIT(P)) buf->redRow[R][P] |= bar;
+							else buf->redRow[R][P] &= ~bar;
 
-				if(color->green & BIT(P)) buf->greenRow[R][P] |= bar;
-				else buf->greenRow[R][P] &= ~bar;
+							if(color->green & BIT(P)) buf->greenRow[R][P] |= bar;
+							else buf->greenRow[R][P] &= ~bar;
 
-				if(color->blue & BIT(P)) buf->blueRow[R][P] |= bar;
-				else buf->blueRow[R][P] &= ~bar;
+							if(color->blue & BIT(P)) buf->blueRow[R][P] |= bar;
+							else buf->blueRow[R][P] &= ~bar;
+						}
+					}
+				}
+				Y0 += ystep;
+				err += dx;
+				bar = 0;
+				oldR = X0;
 			}
+		}
+	}
+	else
+	{
+		int R, P;
+		uint32_t bar = 0;
+		for(; X0 <= X1; X0++)
+		{
+			bar |= BIT(DISP__NUM_COLUMNS - X0 - 1);
+			err -= dy;
+			if((err < 0) || (X0 == X1))
+			{
+				R = Y0;
+				if((R >= 0) && (R < DISP__NUM_ROWS))
+				{
+					for(P = 0; P < DISP__COLOR_DEPTH; P++)
+					{
+						if(color->red & BIT(P)) buf->redRow[R][P] |= bar;
+						else buf->redRow[R][P] &= ~bar;
 
-			Y0 += ystep;
-			err += dx;
-			bar = 0;
+						if(color->green & BIT(P)) buf->greenRow[R][P] |= bar;
+						else buf->greenRow[R][P] &= ~bar;
+
+						if(color->blue & BIT(P)) buf->blueRow[R][P] |= bar;
+						else buf->blueRow[R][P] &= ~bar;
+					}
+				}
+				Y0 += ystep;
+				err += dx;
+				bar = 0;
+			}
 		}
 	}
 

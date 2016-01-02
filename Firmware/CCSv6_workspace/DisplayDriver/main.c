@@ -35,7 +35,7 @@ int main(void) {
 	DISP__setColorPDM(&drawColor, 0, 0, 8);
 	DISP__drawCircle(&screenBuff, &drawColor, 7, 7, 7);
 	DISP__setColorPDM(&drawColor, 8, 0, 0);
-	DISP__drawLine(&screenBuff, &drawColor, 5, 5, 7, 7);
+	DISP__drawLine(&screenBuff, &drawColor, 0, 11, 0, 11);
 
 	// Draw screen
 	DISP__drawScreen(&screenBuff);
