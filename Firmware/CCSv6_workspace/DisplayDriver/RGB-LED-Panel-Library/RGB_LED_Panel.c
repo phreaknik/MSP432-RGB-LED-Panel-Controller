@@ -376,8 +376,75 @@ void DISP__frameTimerISR(void)
 }
 
 
-void DISP__drawLine()
+void DISP__drawLine(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X0, int Y0, int X1, int Y1)
 {
+	// Don't draw anything if line is completely off screen
+	if(Y0 >= DISP__NUM_ROWS && Y1 >= DISP__NUM_ROWS) return;			// Line is off screen, so nothing to draw
+	if(X0 >= DISP__NUM_COLUMNS && X1 >= DISP__NUM_COLUMNS) return;			// Line is off screen, so nothing to draw
+	if(Y0 < 0 && Y1 < 0) return;			// Line is off screen, so nothing to draw
+	if(X0 < 0 && X1 < 0) return;			// Line is off screen, so nothing to draw
+
+	// Bresenham's Line Algorithm (https://en.wikipedia.org/wiki/Bresenham's_line_algorithm)
+	int steep = fabs(Y1 - Y0)/fabs(X1 - X0);
+	if(steep)
+	{
+		// Swap X0 and Y0
+		int temp = X0;
+		X0 = Y0;
+		Y0 = temp;
+
+		// Swap X1 and Y1
+		temp = X1;
+		X1 = Y1;
+		Y1 = temp;
+	}
+
+	if(X0 > X1)
+	{
+		// Swap X0 and X1
+		int temp = X0;
+		X0 = X1;
+		X1 = temp;
+
+		// Swap Y0 and Y1
+		temp = Y1;
+		Y1 = Y0;
+		Y0 = temp;
+	}
+
+	int dx, dy, err, ystep;
+	dx = X1 - X0;
+	dy = fabs(Y1 - Y0);
+	err = dx/2;
+	ystep = (Y0 < Y1) ? 1 : -1;
+
+	// Draw to screenBuf
+	int R, P;
+	uint32_t bar = 0;
+	for(; X0 <= X1; X0++)
+	{
+		bar |= (steep) ? BIT(DISP__NUM_COLUMNS - Y0 - 1) : BIT(DISP__NUM_COLUMNS - X0 - 1);
+		err -= dy;
+		if((err < 0) || (X0 == X1))
+		{
+			R = (steep) ? X0 : Y0;
+			for(P = 0; P < DISP__COLOR_DEPTH; P++)
+			{
+				if(color->red & BIT(P)) buf->redRow[R][P] |= bar;
+				else buf->redRow[R][P] &= ~bar;
+
+				if(color->green & BIT(P)) buf->greenRow[R][P] |= bar;
+				else buf->greenRow[R][P] &= ~bar;
+
+				if(color->blue & BIT(P)) buf->blueRow[R][P] |= bar;
+				else buf->blueRow[R][P] &= ~bar;
+			}
+
+			Y0 += ystep;
+			err += dx;
+			bar = 0;
+		}
+	}
 
 }
 
