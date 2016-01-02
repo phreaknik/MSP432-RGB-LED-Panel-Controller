@@ -376,6 +376,32 @@ void DISP__frameTimerISR(void)
 }
 
 
+void DISP__drawPixel(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y)
+{
+	// Make sure pixel is on screen
+	if(X < 0) return;
+	if(X >= DISP__NUM_COLUMNS) return;
+	if(Y < 0) return;
+	if(Y >= DISP__NUM_ROWS) return;
+
+	// Create bar with pixel on X coordinate
+	uint32_t bar = BIT(DISP__NUM_COLUMNS - X - 1);
+
+	// Draw to screenBuf
+	int P;
+	for(P = 0; P < DISP__COLOR_DEPTH; P++)
+	{
+		if(color->red & BIT(P)) buf->redRow[Y][P] |= bar;
+		else buf->redRow[Y][P] &= ~bar;
+
+		if(color->green & BIT(P)) buf->greenRow[Y][P] |= bar;
+		else buf->greenRow[Y][P] &= ~bar;
+
+		if(color->blue & BIT(P)) buf->blueRow[Y][P] |= bar;
+		else buf->blueRow[Y][P] &= ~bar;
+	}
+}
+
 void DISP__drawLine(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X0, int Y0, int X1, int Y1)
 {
 	// Don't draw anything if line is completely off screen
