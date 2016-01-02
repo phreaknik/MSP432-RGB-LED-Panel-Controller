@@ -530,14 +530,14 @@ void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y
 		X = 0;					// Limit X
 	}
 	int Y_lim = Y + height - 1;
-	if(Y_lim > 15) Y_lim = 15;	// Limit height
-	int X_lim = 32 - X - width;
+	if(Y_lim >= DISP__NUM_ROWS) Y_lim = DISP__NUM_ROWS - 1;	// Limit height
+	int X_lim = DISP__NUM_COLUMNS - X - width;
 	if(X_lim < 0) X_lim = 0;	// Limit width
 
 	// Create bar to build rectangle from
 	uint32_t bar = 0;
 	int i;
-	for(i = (31-X); i >= X_lim; i--) bar += BIT(i);
+	for(i = (DISP__NUM_COLUMNS - X - 1); i >= X_lim; i--) bar += BIT(i);
 
 	// Build rectangle from bar
 	int R, P;
@@ -655,9 +655,9 @@ void DISP__drawCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int
 void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, char alphNum, int X, int Y)
 {
 	// Limit X & Y range
-	if(X > 31) 	X = 31;
+	if(X >= DISP__NUM_COLUMNS) 	X = DISP__NUM_COLUMNS - 1;
 	if(X < 0)	X = 0;
-	if(Y > 15) 	Y = 15;
+	if(Y >= DISP__NUM_ROWS) 	Y = DISP__NUM_ROWS - 1;
 	if(Y < 0)	Y = 0;
 	// Shift ASCII value to match charMap, since charMap starts at the 32nd ASCII value
 	alphNum -= 32;
