@@ -427,65 +427,89 @@ void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y
 void DISP__drawCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int radius)
 {
 	// Local variables
-	uint32_t bar = 0;
-	float half_width = 0;
-	int yOffset = 0;
-	float r_squared = pow(radius,2);
+	uint32_t barx, bary;
+	int f, ddF_x, ddF_y, x, y;
 
 	// Take absolute value of radius
 	if (radius < 0) radius = 0 - radius;	// Efficient absolute value
+
+	// Initialize variables
+	f = 1 - radius;
+	ddF_x = 1;
+	ddF_y = -2 * radius;
+	x = 0;
+	y = radius;
 
 	// Limit dimensions
 	if((Y - radius > (DISP__NUM_ROWS - 1)) || (Y + radius < 0)) return;			// Circle is completely off screen, so nothing to draw
 	if((X - radius > (DISP__NUM_COLUMNS - 1)) || (X + radius < 0)) return;			// Circle is completely off screen, so nothing to draw
 
 	// Build circle from bar
-	int R, P;
+	int P;
 	for(P = 0; P < DISP__COLOR_DEPTH; P++)
 	{
-		R = Y;
-		while(R <= Y + radius)
+		while(x<y)
 		{
-			// Create bar to draw
-			half_width = sqrt(r_squared - pow(R - Y,2));	// Calculate half width of the x-segment at this row
-			half_width = round(half_width);
-			bar = 0xFFFFFFFF & ~(0xFFFFFFFF >> ((int)half_width + X + 1));
-			bar &= ~(0xFFFFFFFF << (DISP__NUM_COLUMNS - X + (int)half_width - 1));
+			if(f >= 0)
+			{
+				y--;
+				ddF_y += 2;
+				f += ddF_y;
+			}
+			x++;
+			ddF_x += 2;
+			f += ddF_x;
+
+			// Create bars to draw
+			bary = 0xFFFFFFFF & ~(0xFFFFFFFF >> X + x);
+			bary &= ~(0xFFFFFFFF << (DISP__NUM_COLUMNS - X + x));
+			barx = 0xFFFFFFFF & ~(0xFFFFFFFF >> X + y);
+			barx &= ~(0xFFFFFFFF << (DISP__NUM_COLUMNS - X + y));
 
 			// Now draw bar
-			yOffset = Y+Y-R;
-			R++; // Increment R before drawing rows
 			if(color->red & BIT(P))
 			{
-				buf->redRow[R][P] |= bar;	// Draw bottom half of circle
-				if(yOffset >= 0) buf->redRow[yOffset][P] |= bar;	// Draw top half of circle
+				buf->redRow[Y + y][P] |= bary;
+				buf->redRow[Y - y + 1][P] |= bary;
+				buf->redRow[Y + x][P] |= barx;
+				buf->redRow[Y - x + 1][P] |= barx;
 			}
 			else
 			{
-				buf->redRow[R][P] &= ~bar;	// Draw bottom half of circle
-				if(yOffset >= 0) buf->redRow[yOffset][P] &= ~bar;	// Draw top half of circle
+				buf->redRow[Y + y][P] &= ~bary;
+				buf->redRow[Y - y + 1][P] &= ~bary;
+				buf->redRow[Y + x][P] &= ~barx;
+				buf->redRow[Y - x + 1][P] &= ~barx;
 			}
 
 			if(color->green & BIT(P))
 			{
-				buf->greenRow[R][P] |= bar;	// Draw bottom half of circle
-				if(yOffset >= 0) buf->greenRow[yOffset][P] |= bar;	// Draw top half of circle
+				buf->greenRow[Y + y][P] |= bary;
+				buf->greenRow[Y - y + 1][P] |= bary;
+				buf->greenRow[Y + x][P] |= barx;
+				buf->greenRow[Y - x + 1][P] |= barx;
 			}
 			else
 			{
-				buf->greenRow[R][P] &= ~bar;	// Draw bottom half of circle
-				if(yOffset >= 0) buf->greenRow[yOffset][P] &= ~bar;	// Draw top half of circle
+				buf->greenRow[Y + y][P] &= ~bary;
+				buf->greenRow[Y - y + 1][P] &= ~bary;
+				buf->greenRow[Y + x][P] &= ~barx;
+				buf->greenRow[Y - x + 1][P] &= ~barx;
 			}
 
 			if(color->blue & BIT(P))
 			{
-				buf->blueRow[R][P] |= bar;	// Draw bottom half of circle
-				if(yOffset >= 0) buf->blueRow[yOffset][P] |= bar;	// Draw top half of circle
+				buf->blueRow[Y + y][P] |= bary;
+				buf->blueRow[Y - y + 1][P] |= bary;
+				buf->blueRow[Y + x][P] |= barx;
+				buf->blueRow[Y - x + 1][P] |= barx;
 			}
 			else
 			{
-				buf->blueRow[R][P] &= ~bar;	// Draw bottom half of circle
-				if(yOffset >= 0) buf->blueRow[yOffset][P] &= ~bar;	// Draw top half of circle
+				buf->blueRow[Y + y][P] &= ~bary;
+				buf->blueRow[Y - y + 1][P] &= ~bary;
+				buf->blueRow[Y + x][P] &= ~barx;
+				buf->blueRow[Y - x + 1][P] &= ~barx;
 			}
 		}
 	}
