@@ -536,8 +536,8 @@ void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y
 
 	// Create bar to build rectangle from
 	uint32_t bar = 0;
-	int i;
-	for(i = (DISP__NUM_COLUMNS - X - 1); i >= X_lim; i--) bar += BIT(i);
+	bar = 0xFFFFFFFF << (DISP__NUM_COLUMNS - width - 1);
+	bar = bar >> X;
 
 	// Build rectangle from bar
 	int R, P;
