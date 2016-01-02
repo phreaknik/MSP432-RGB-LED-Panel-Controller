@@ -428,7 +428,7 @@ void DISP__drawCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int
 {
 	// Local variables
 	uint32_t barx, bary;
-	int f, ddF_x, ddF_y, x, y;
+	int f, ddF_x, ddF_y, x, y, P;
 
 	// Take absolute value of radius
 	if (radius < 0) radius = 0 - radius;	// Efficient absolute value
@@ -445,71 +445,75 @@ void DISP__drawCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int
 	if((X - radius > (DISP__NUM_COLUMNS - 1)) || (X + radius < 0)) return;			// Circle is completely off screen, so nothing to draw
 
 	// Build circle from bar
-	int P;
-	for(P = 0; P < DISP__COLOR_DEPTH; P++)
+	while(x<y)
 	{
-		while(x<y)
+		if(f >= 0)
 		{
-			if(f >= 0)
-			{
-				y--;
-				ddF_y += 2;
-				f += ddF_y;
-			}
-			x++;
-			ddF_x += 2;
-			f += ddF_x;
+			y--;
+			ddF_y += 2;
+			f += ddF_y;
+		}
+		x++;
+		ddF_x += 2;
+		f += ddF_x;
 
-			// Create bars to draw
-			bary = 0xFFFFFFFF & ~(0xFFFFFFFF >> X + x);
-			bary &= ~(0xFFFFFFFF << (DISP__NUM_COLUMNS - X + x));
-			barx = 0xFFFFFFFF & ~(0xFFFFFFFF >> X + y);
-			barx &= ~(0xFFFFFFFF << (DISP__NUM_COLUMNS - X + y));
+		// Create bars to draw
+		bary = 0xFFFFFFFF & ~(0xFFFFFFFF >> X + x + 1);
+		bary &= ~(0xFFFFFFFF << (DISP__NUM_COLUMNS - X + x - 1));
+		barx = 0xFFFFFFFF & ~(0xFFFFFFFF >> X + y + 1);
+		barx &= ~(0xFFFFFFFF << (DISP__NUM_COLUMNS - X + y - 1));
 
-			// Now draw bar
+		// Set indices
+		int Ypy = Y + y;
+		int Ymy = Y - y + 1;
+		int Ypx = Y + x;
+		int Ymx = Y - x + 1;
+		// Now draw bars
+		for(P = 0; P < DISP__COLOR_DEPTH; P++)
+		{
 			if(color->red & BIT(P))
 			{
-				buf->redRow[Y + y][P] |= bary;
-				buf->redRow[Y - y + 1][P] |= bary;
-				buf->redRow[Y + x][P] |= barx;
-				buf->redRow[Y - x + 1][P] |= barx;
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->redRow[Ypy][P] |= bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->redRow[Ymy][P] |= bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->redRow[Ypx][P] |= barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->redRow[Ymx][P] |= barx;
 			}
 			else
 			{
-				buf->redRow[Y + y][P] &= ~bary;
-				buf->redRow[Y - y + 1][P] &= ~bary;
-				buf->redRow[Y + x][P] &= ~barx;
-				buf->redRow[Y - x + 1][P] &= ~barx;
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->redRow[Ypy][P] &= ~bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->redRow[Ymy][P] &= ~bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->redRow[Ypx][P] &= ~barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->redRow[Ymx][P] &= ~barx;
 			}
 
 			if(color->green & BIT(P))
 			{
-				buf->greenRow[Y + y][P] |= bary;
-				buf->greenRow[Y - y + 1][P] |= bary;
-				buf->greenRow[Y + x][P] |= barx;
-				buf->greenRow[Y - x + 1][P] |= barx;
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->greenRow[Ypy][P] |= bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->greenRow[Ymy][P] |= bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->greenRow[Ypx][P] |= barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->greenRow[Ymx][P] |= barx;
 			}
 			else
 			{
-				buf->greenRow[Y + y][P] &= ~bary;
-				buf->greenRow[Y - y + 1][P] &= ~bary;
-				buf->greenRow[Y + x][P] &= ~barx;
-				buf->greenRow[Y - x + 1][P] &= ~barx;
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->greenRow[Ypy][P] &= ~bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->greenRow[Ymy][P] &= ~bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->greenRow[Ypx][P] &= ~barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->greenRow[Ymx][P] &= ~barx;
 			}
 
 			if(color->blue & BIT(P))
 			{
-				buf->blueRow[Y + y][P] |= bary;
-				buf->blueRow[Y - y + 1][P] |= bary;
-				buf->blueRow[Y + x][P] |= barx;
-				buf->blueRow[Y - x + 1][P] |= barx;
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->blueRow[Ypy][P] |= bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->blueRow[Ymy][P] |= bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->blueRow[Ypx][P] |= barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->blueRow[Ymx][P] |= barx;
 			}
 			else
 			{
-				buf->blueRow[Y + y][P] &= ~bary;
-				buf->blueRow[Y - y + 1][P] &= ~bary;
-				buf->blueRow[Y + x][P] &= ~barx;
-				buf->blueRow[Y - x + 1][P] &= ~barx;
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->blueRow[Ypy][P] &= ~bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->blueRow[Ymy][P] &= ~bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->blueRow[Ypx][P] &= ~barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->blueRow[Ymx][P] &= ~barx;
 			}
 		}
 	}
