@@ -28,12 +28,14 @@ int main(void) {
     // Draw stuff
 	DISP__setColorPDM(&drawColor, 0, 8, 2);
 	DISP__drawRect(&screenBuff, &drawColor, 4, 4, 24, 8);
-	DISP__setColorPDM(&drawColor, 8, 0, 2);
+	DISP__setColorPDM(&drawColor, 8, 8, 8);
 	DISP__drawRect(&screenBuff, &drawColor, 12, 0, 8, 16);
 	DISP__setColorPDM(&drawColor, 0, 0, 0);
 	DISP__drawChar(&screenBuff, &drawColor, 'j', 13, 4);
 	DISP__setColorPDM(&drawColor, 0, 0, 8);
 	DISP__drawCircle(&screenBuff, &drawColor, 7, 7, 7);
+	DISP__setColorPDM(&drawColor, 8, 0, 0);
+	DISP__drawLine(&screenBuff, &drawColor, 5, 5, 7, 7);
 
 	// Draw screen
 	DISP__drawScreen(&screenBuff);
