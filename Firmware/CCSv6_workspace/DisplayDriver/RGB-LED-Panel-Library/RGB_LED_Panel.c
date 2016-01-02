@@ -535,6 +535,85 @@ void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y
 	if(X_lim < 0) X_lim = 0;	// Limit width
 
 	// Create bar to build rectangle from
+	uint32_t top, sides;
+	top = 0xFFFFFFFF << (DISP__NUM_COLUMNS - width - 1);
+	top = top >> X;
+	sides = BIT(DISP__NUM_COLUMNS - X - 1) + BIT(DISP__NUM_COLUMNS - X - width - 1);
+
+	// Build rectangle from bar
+	int R, P;
+	for(P = 0; P < DISP__COLOR_DEPTH; P++)
+	{
+		// Draw top & bottom
+		if(color->red & BIT(P))
+		{
+			buf->redRow[Y][P] |= top;
+			buf->redRow[Y_lim][P] |= top;
+		}
+		else
+		{
+			buf->redRow[Y][P] &= ~top;
+			buf->redRow[Y_lim][P] &= ~top;
+		}
+
+		if(color->green & BIT(P))
+		{
+			buf->greenRow[Y][P] |= top;
+			buf->greenRow[Y_lim][P] |= top;
+		}
+		else
+		{
+			buf->greenRow[Y][P] &= ~top;
+			buf->greenRow[Y_lim][P] &= ~top;
+		}
+
+		if(color->blue & BIT(P))
+		{
+			buf->blueRow[Y][P] |= top;
+			buf->blueRow[Y_lim][P] |= top;
+		}
+		else
+		{
+			buf->blueRow[Y][P] &= ~top;
+			buf->blueRow[Y_lim][P] &= ~top;
+		}
+
+		// Draw sides
+		for(R = Y + 1; R < Y_lim; R++)
+		{
+			if(color->red & BIT(P)) buf->redRow[R][P] |= sides;
+			else buf->redRow[R][P] &= ~sides;
+
+			if(color->green & BIT(P)) buf->greenRow[R][P] |= sides;
+			else buf->greenRow[R][P] &= ~sides;
+
+			if(color->blue & BIT(P)) buf->blueRow[R][P] |= sides;
+			else buf->blueRow[R][P] &= ~sides;
+		}
+	}
+}
+
+void DISP__fillRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int width, int height)
+{
+	// Limit dimensions
+	if(Y > (DISP__NUM_ROWS - 1) || (Y + height) < 0) return;			// Rectangle is off screen, so nothing to draw
+	if(X > (DISP__NUM_COLUMNS - 1) || (X + width) < 0) return;			// Rectangle is off screen, so nothing to draw
+	if(Y < 0)
+	{
+		height += Y;			// Reduce height to simulate drawing off screen
+		Y = 0;					// Limit Y
+	}
+	if(X < 0)
+	{
+		width += X;				// Reduce width to simulate drawing off screen
+		X = 0;					// Limit X
+	}
+	int Y_lim = Y + height - 1;
+	if(Y_lim >= DISP__NUM_ROWS) Y_lim = DISP__NUM_ROWS - 1;	// Limit height
+	int X_lim = DISP__NUM_COLUMNS - X - width;
+	if(X_lim < 0) X_lim = 0;	// Limit width
+
+	// Create bar to build rectangle from
 	uint32_t bar = 0;
 	bar = 0xFFFFFFFF << (DISP__NUM_COLUMNS - width - 1);
 	bar = bar >> X;
