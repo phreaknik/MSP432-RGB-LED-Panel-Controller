@@ -428,10 +428,9 @@ void DISP__drawCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int
 {
 	// Local variables
 	uint32_t bar = 0;
-	float pi = 3.14159265359;
-	float xOffset = 0;
-	int xLow = 0;
-	int xHigh = 0;
+	float half_width = 0;
+	int yOffset = 0;
+	float r_squared = pow(radius,2);
 
 	// Take absolute value of radius
 	if (radius < 0) radius = 0 - radius;	// Efficient absolute value
@@ -440,42 +439,54 @@ void DISP__drawCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int
 	if((Y - radius > (DISP__NUM_ROWS - 1)) || (Y + radius < 0)) return;			// Circle is completely off screen, so nothing to draw
 	if((X - radius > (DISP__NUM_COLUMNS - 1)) || (X + radius < 0)) return;			// Circle is completely off screen, so nothing to draw
 
-	// Build rectangle from bar
+	// Build circle from bar
 	int R, P;
 	for(P = 0; P < DISP__COLOR_DEPTH; P++)
 	{
-		for(R = Y; R <= Y + radius; R++)
+		R = Y;
+		while(R <= Y + radius)
 		{
 			// Create bar to draw
-			xOffset = R - Y;
-			xOffset /= (float) radius;
-			xOffset = cos(xOffset * pi);
-			xOffset *= (float) R;
-			xOffset = round(xOffset);	// Round to nearest integer
-			xLow = X - xOffset;
-			xHigh = X + xOffset;
-
-			// Set pixel of bar only if pixel is on screen
-			if( !((xLow < 0) || (xLow > DISP__NUM_COLUMNS)) )	bar = 0xFFFFFFFF >> xLow;
-			if( !((xHigh < 0) || (xHigh > DISP__NUM_COLUMNS)) )	bar &= ~(0xFFFFFFFF >> xHigh);
+			half_width = sqrt(r_squared - pow(R - Y,2));	// Calculate half width of the x-segment at this row
+			half_width = round(half_width);
+			bar = 0xFFFFFFFF & ~(0xFFFFFFFF >> ((int)half_width + X + 1));
+			bar &= ~(0xFFFFFFFF << (DISP__NUM_COLUMNS - X + (int)half_width - 1));
 
 			// Now draw bar
+			yOffset = Y+Y-R;
+			R++; // Increment R before drawing rows
 			if(color->red & BIT(P))
 			{
-				FIXME: Add code to draw top haf of circle at same time as bottom half
-				buf->redRow[R][P] |= bar;
-				buf->redRow[R][P] |= bar;
+				buf->redRow[R][P] |= bar;	// Draw bottom half of circle
+				if(yOffset >= 0) buf->redRow[yOffset][P] |= bar;	// Draw top half of circle
 			}
 			else
 			{
-				buf->redRow[R][P] &= ~bar;
+				buf->redRow[R][P] &= ~bar;	// Draw bottom half of circle
+				if(yOffset >= 0) buf->redRow[yOffset][P] &= ~bar;	// Draw top half of circle
 			}
 
-			if(color->green & BIT(P)) buf->greenRow[R][P] |= bar;
-			else buf->greenRow[R][P] &= ~bar;
+			if(color->green & BIT(P))
+			{
+				buf->greenRow[R][P] |= bar;	// Draw bottom half of circle
+				if(yOffset >= 0) buf->greenRow[yOffset][P] |= bar;	// Draw top half of circle
+			}
+			else
+			{
+				buf->greenRow[R][P] &= ~bar;	// Draw bottom half of circle
+				if(yOffset >= 0) buf->greenRow[yOffset][P] &= ~bar;	// Draw top half of circle
+			}
 
-			if(color->blue & BIT(P)) buf->blueRow[R][P] |= bar;
-			else buf->blueRow[R][P] &= ~bar;
+			if(color->blue & BIT(P))
+			{
+				buf->blueRow[R][P] |= bar;	// Draw bottom half of circle
+				if(yOffset >= 0) buf->blueRow[yOffset][P] |= bar;	// Draw top half of circle
+			}
+			else
+			{
+				buf->blueRow[R][P] &= ~bar;	// Draw bottom half of circle
+				if(yOffset >= 0) buf->blueRow[yOffset][P] &= ~bar;	// Draw top half of circle
+			}
 		}
 	}
 }
