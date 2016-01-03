@@ -8,9 +8,9 @@ void systemInit();
 
 int main(void) {
 	// Variables
-	DISP__imgBuf screenBuff;				// Buffer to build image and send to screen
-	DISP__PDMcolor bgColor;
+	DISP__imgBuf screenBuff;
 	DISP__PDMcolor drawColor;
+	int red, green, blue, x, redStep, greenStep, blueStep, xStep;
 
 	// Initialize MCU
 	systemInit();
@@ -21,31 +21,40 @@ int main(void) {
     DISP__setFrameRate(60);
     DISP__setBrightness(0x4000);
 
-	// Set background color
-	DISP__setColorPDM(&bgColor, 0, 0, 0);
-    DISP__fillScreen(&screenBuff, &bgColor);
+    // Clear screen
+    DISP__setColorPDM(&drawColor, 0, 0, 0);
+    DISP__fillScreen(&screenBuff, &drawColor);
 
-    // Draw stuff
-	DISP__setColorPDM(&drawColor, 0, 8, 2);
-	DISP__drawRect(&screenBuff, &drawColor, 4, 4, 24, 8);
-	DISP__setColorPDM(&drawColor, 8, 8, 8);
-	DISP__drawRect(&screenBuff, &drawColor, 12, 0, 8, 16);
-	DISP__setColorPDM(&drawColor, 0, 0, 8);
-	DISP__drawCircle(&screenBuff, &drawColor, 7, 7, 7);
-	DISP__setColorPDM(&drawColor, 8, 0, 0);
-	DISP__drawLine(&screenBuff, &drawColor, 0, 13, 31, 13);
-	DISP__setColorPDM(&drawColor, 8, 0, 8);
-	DISP__drawPixel(&screenBuff, &drawColor, 30, 1);
-	DISP__setColorPDM(&drawColor, 8, 8, 0);
-	DISP__drawChar(&screenBuff, &drawColor, "Test!", 7, 1, 0, 0);
-
-	// Draw screen
-	DISP__drawScreen(&screenBuff);
-
+    x = 0;
+    xStep = 1;
+    red = 3;
+    green = 6;
+    blue = 0;
+    redStep = 1;
+    greenStep = 1;
+    blueStep = 1;
     while(1) // Main loop
     {
         // Update state machine
     	DISP__stateMachine();	// Must be called periodically to handle display state machine
+
+    	// Draw next shape
+    	x += xStep;
+    	red += redStep;
+    	green += greenStep;
+    	blue += blueStep;
+
+    	DISP__setColorPDM(&drawColor, red, green, blue);
+    	DISP__drawRect(&screenBuff, &drawColor, x, 0, 8, 16);
+
+    	// Draw screen
+    	DISP__drawScreen(&screenBuff);
+
+    	// Scan position and color
+    	if((x >= 24) || (x <= 0)) xStep *= -1;
+    	if((red > 8) || (red <= 0)) redStep *= -1;
+    	if((green > 8) || (green <= 0)) greenStep *= -1;
+    	if((blue > 8) || (blue <= 0)) blueStep *= -1;
 
         // Go to sleep until next interrupt
         __sleep();
