@@ -21,8 +21,7 @@
  */
 
 #include "../RGB-LED-Panel-Library/RGB_LED_Panel.h"
-
-#include "msp.h"
+#include "../RGB-LED-Panel-Library/char_map.h"
 
 
 // Global variables
@@ -377,27 +376,247 @@ void DISP__frameTimerISR(void)
 }
 
 
-void DISP__drawLine()
+void DISP__drawPixel(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y)
 {
+	// Make sure pixel is on screen
+	if(X < 0) return;
+	if(X >= DISP__NUM_COLUMNS) return;
+	if(Y < 0) return;
+	if(Y >= DISP__NUM_ROWS) return;
+
+	// Create bar with pixel on X coordinate
+	uint32_t bar = BIT(DISP__NUM_COLUMNS - X - 1);
+
+	// Draw to screenBuf
+	int P;
+	for(P = 0; P < DISP__COLOR_DEPTH; P++)
+	{
+		if(color->red & BIT(P)) buf->redRow[Y][P] |= bar;
+		else buf->redRow[Y][P] &= ~bar;
+
+		if(color->green & BIT(P)) buf->greenRow[Y][P] |= bar;
+		else buf->greenRow[Y][P] &= ~bar;
+
+		if(color->blue & BIT(P)) buf->blueRow[Y][P] |= bar;
+		else buf->blueRow[Y][P] &= ~bar;
+	}
+}
+
+void DISP__drawLine(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X0, int Y0, int X1, int Y1)
+{
+	// Don't draw anything if line is completely off screen
+	if(Y0 >= DISP__NUM_ROWS && Y1 >= DISP__NUM_ROWS) return;			// Line is off screen, so nothing to draw
+	if(X0 >= DISP__NUM_COLUMNS && X1 >= DISP__NUM_COLUMNS) return;			// Line is off screen, so nothing to draw
+	if(Y0 < 0 && Y1 < 0) return;			// Line is off screen, so nothing to draw
+	if(X0 < 0 && X1 < 0) return;			// Line is off screen, so nothing to draw
+
+	// Bresenham's Line Algorithm (https://en.wikipedia.org/wiki/Bresenham's_line_algorithm)
+	int steep = fabs(Y1 - Y0) > fabs(X1 - X0);
+	if(steep)
+	{
+		// Swap X0 and Y0
+		int temp = X0;
+		X0 = Y0;
+		Y0 = temp;
+
+		// Swap X1 and Y1
+		temp = X1;
+		X1 = Y1;
+		Y1 = temp;
+	}
+
+	if(X0 > X1)
+	{
+		// Swap X0 and X1
+		int temp = X0;
+		X0 = X1;
+		X1 = temp;
+
+		// Swap Y0 and Y1
+		temp = Y1;
+		Y1 = Y0;
+		Y0 = temp;
+	}
+
+	int dx, dy, err, ystep;
+	dx = X1 - X0;
+	dy = fabs(Y1 - Y0);
+	err = dx/2;
+	ystep = (Y0 < Y1) ? 1 : -1;
+
+	// Draw to screenBuf
+	if(steep)
+	{
+		int R, P, oldR;
+		uint32_t bar = 0;
+		oldR = X0;
+		for(; X0 <= X1; X0++)
+		{
+			bar |= BIT(DISP__NUM_COLUMNS - Y0 - 1);
+			err -= dy;
+			if((err < 0) || (X0 == X1))
+			{
+				for(R = oldR; R <= X0; R++)
+				{
+					if((R >= 0) && (R < DISP__NUM_ROWS))
+					{
+						for(P = 0; P < DISP__COLOR_DEPTH; P++)
+						{
+							if(color->red & BIT(P)) buf->redRow[R][P] |= bar;
+							else buf->redRow[R][P] &= ~bar;
+
+							if(color->green & BIT(P)) buf->greenRow[R][P] |= bar;
+							else buf->greenRow[R][P] &= ~bar;
+
+							if(color->blue & BIT(P)) buf->blueRow[R][P] |= bar;
+							else buf->blueRow[R][P] &= ~bar;
+						}
+					}
+				}
+				Y0 += ystep;
+				err += dx;
+				bar = 0;
+				oldR = X0;
+			}
+		}
+	}
+	else
+	{
+		int R, P;
+		uint32_t bar = 0;
+		for(; X0 <= X1; X0++)
+		{
+			bar |= BIT(DISP__NUM_COLUMNS - X0 - 1);
+			err -= dy;
+			if((err < 0) || (X0 == X1))
+			{
+				R = Y0;
+				if((R >= 0) && (R < DISP__NUM_ROWS))
+				{
+					for(P = 0; P < DISP__COLOR_DEPTH; P++)
+					{
+						if(color->red & BIT(P)) buf->redRow[R][P] |= bar;
+						else buf->redRow[R][P] &= ~bar;
+
+						if(color->green & BIT(P)) buf->greenRow[R][P] |= bar;
+						else buf->greenRow[R][P] &= ~bar;
+
+						if(color->blue & BIT(P)) buf->blueRow[R][P] |= bar;
+						else buf->blueRow[R][P] &= ~bar;
+					}
+				}
+				Y0 += ystep;
+				err += dx;
+				bar = 0;
+			}
+		}
+	}
 
 }
 
-void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int height, int width)
+void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int width, int height)
 {
 	// Limit dimensions
-	if(Y > 15) Y = 15;			// Limit Y
-	if(Y < 0) Y = 0;			// Limit Y
-	if(X > 31) X = 31;			// Limit X
-	if(X < 0) X = 0;			// Limit X
+	if(Y > (DISP__NUM_ROWS - 1) || (Y + height) < 0) return;			// Rectangle is off screen, so nothing to draw
+	if(X > (DISP__NUM_COLUMNS - 1) || (X + width) < 0) return;			// Rectangle is off screen, so nothing to draw
+	if(Y < 0)
+	{
+		height += Y;			// Reduce height to simulate drawing off screen
+		Y = 0;					// Limit Y
+	}
+	if(X < 0)
+	{
+		width += X;				// Reduce width to simulate drawing off screen
+		X = 0;					// Limit X
+	}
 	int Y_lim = Y + height - 1;
-	if(Y_lim > 15) Y_lim = 15;	// Limit height
-	int X_lim = 32 - X - width;
+	if(Y_lim >= DISP__NUM_ROWS) Y_lim = DISP__NUM_ROWS - 1;	// Limit height
+	int X_lim = DISP__NUM_COLUMNS - X - width;
+	if(X_lim < 0) X_lim = 0;	// Limit width
+
+	// Create bar to build rectangle from
+	uint32_t top, sides;
+	top = 0xFFFFFFFF << (DISP__NUM_COLUMNS - width - 1);
+	top = top >> X;
+	sides = BIT(DISP__NUM_COLUMNS - X - 1) + BIT(DISP__NUM_COLUMNS - X - width - 1);
+
+	// Build rectangle from bar
+	int R, P;
+	for(P = 0; P < DISP__COLOR_DEPTH; P++)
+	{
+		// Draw top & bottom
+		if(color->red & BIT(P))
+		{
+			buf->redRow[Y][P] |= top;
+			buf->redRow[Y_lim][P] |= top;
+		}
+		else
+		{
+			buf->redRow[Y][P] &= ~top;
+			buf->redRow[Y_lim][P] &= ~top;
+		}
+
+		if(color->green & BIT(P))
+		{
+			buf->greenRow[Y][P] |= top;
+			buf->greenRow[Y_lim][P] |= top;
+		}
+		else
+		{
+			buf->greenRow[Y][P] &= ~top;
+			buf->greenRow[Y_lim][P] &= ~top;
+		}
+
+		if(color->blue & BIT(P))
+		{
+			buf->blueRow[Y][P] |= top;
+			buf->blueRow[Y_lim][P] |= top;
+		}
+		else
+		{
+			buf->blueRow[Y][P] &= ~top;
+			buf->blueRow[Y_lim][P] &= ~top;
+		}
+
+		// Draw sides
+		for(R = Y + 1; R < Y_lim; R++)
+		{
+			if(color->red & BIT(P)) buf->redRow[R][P] |= sides;
+			else buf->redRow[R][P] &= ~sides;
+
+			if(color->green & BIT(P)) buf->greenRow[R][P] |= sides;
+			else buf->greenRow[R][P] &= ~sides;
+
+			if(color->blue & BIT(P)) buf->blueRow[R][P] |= sides;
+			else buf->blueRow[R][P] &= ~sides;
+		}
+	}
+}
+
+void DISP__fillRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int width, int height)
+{
+	// Limit dimensions
+	if(Y > (DISP__NUM_ROWS - 1) || (Y + height) < 0) return;			// Rectangle is off screen, so nothing to draw
+	if(X > (DISP__NUM_COLUMNS - 1) || (X + width) < 0) return;			// Rectangle is off screen, so nothing to draw
+	if(Y < 0)
+	{
+		height += Y;			// Reduce height to simulate drawing off screen
+		Y = 0;					// Limit Y
+	}
+	if(X < 0)
+	{
+		width += X;				// Reduce width to simulate drawing off screen
+		X = 0;					// Limit X
+	}
+	int Y_lim = Y + height - 1;
+	if(Y_lim >= DISP__NUM_ROWS) Y_lim = DISP__NUM_ROWS - 1;	// Limit height
+	int X_lim = DISP__NUM_COLUMNS - X - width;
 	if(X_lim < 0) X_lim = 0;	// Limit width
 
 	// Create bar to build rectangle from
 	uint32_t bar = 0;
-	int i;
-	for(i = (31-X); i >= X_lim; i--) bar += BIT(i);
+	bar = 0xFFFFFFFF << (DISP__NUM_COLUMNS - width - 1);
+	bar = bar >> X;
 
 	// Build rectangle from bar
 	int R, P;
@@ -417,45 +636,228 @@ void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y
 	}
 }
 
-void DISP__drawCircle()
+void DISP__drawCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int radius)
 {
+	// Local variables
+	uint32_t barx, bary;
+	int f, ddF_x, ddF_y, x, y, P;
 
+	// Take absolute value of radius
+	if (radius < 0) radius = 0 - radius;	// Efficient absolute value
+
+	// Initialize variables
+	f = 1 - radius;
+	ddF_x = 1;
+	ddF_y = -2 * radius;
+	x = 0;
+	y = radius;
+
+	// Limit dimensions
+	if((Y - radius > (DISP__NUM_ROWS - 1)) || (Y + radius < 0)) return;			// Circle is completely off screen, so nothing to draw
+	if((X - radius > (DISP__NUM_COLUMNS - 1)) || (X + radius < 0)) return;			// Circle is completely off screen, so nothing to draw
+
+	// Build circle from bar
+	while(x<y)
+	{
+		if(f >= 0)
+		{
+			y--;
+			ddF_y += 2;
+			f += ddF_y;
+		}
+		x++;
+		ddF_x += 2;
+		f += ddF_x;
+
+		// Create bars to draw
+		bary = BIT(DISP__NUM_COLUMNS - X - x - 1) + BIT(DISP__NUM_COLUMNS - X + x - 2);
+		barx = BIT(DISP__NUM_COLUMNS - X - y - 1) + BIT(DISP__NUM_COLUMNS - X + y - 2);
+
+		// Set indices
+		int Ypy = Y + y;
+		int Ymy = Y - y + 1;
+		int Ypx = Y + x;
+		int Ymx = Y - x + 1;
+		// Now draw bars
+		for(P = 0; P < DISP__COLOR_DEPTH; P++)
+		{
+			if(color->red & BIT(P))
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->redRow[Ypy][P] |= bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->redRow[Ymy][P] |= bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->redRow[Ypx][P] |= barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->redRow[Ymx][P] |= barx;
+			}
+			else
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->redRow[Ypy][P] &= ~bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->redRow[Ymy][P] &= ~bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->redRow[Ypx][P] &= ~barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->redRow[Ymx][P] &= ~barx;
+			}
+
+			if(color->green & BIT(P))
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->greenRow[Ypy][P] |= bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->greenRow[Ymy][P] |= bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->greenRow[Ypx][P] |= barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->greenRow[Ymx][P] |= barx;
+			}
+			else
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->greenRow[Ypy][P] &= ~bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->greenRow[Ymy][P] &= ~bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->greenRow[Ypx][P] &= ~barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->greenRow[Ymx][P] &= ~barx;
+			}
+
+			if(color->blue & BIT(P))
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->blueRow[Ypy][P] |= bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->blueRow[Ymy][P] |= bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->blueRow[Ypx][P] |= barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->blueRow[Ymx][P] |= barx;
+			}
+			else
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->blueRow[Ypy][P] &= ~bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->blueRow[Ymy][P] &= ~bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->blueRow[Ypx][P] &= ~barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->blueRow[Ymx][P] &= ~barx;
+			}
+		}
+	}
 }
 
-void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, const char alphNum)
+void DISP__fillCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int radius)
 {
-	// FIXME: Only hardcoded to draw letter 'A'
-	uint32_t letter[DISP__NUM_ROWS];
-	letter[0]	=	0b00100000000000000000000000000000;
-	letter[1]	=	0b01010000000000000000000000000000;
-	letter[2]	=	0b10001000000000000000000000000000;
-	letter[3]	=	0b10001000000000000000000000000000;
-	letter[4]	=	0b11111000000000000000000000000000;
-	letter[5]	=	0b10001000000000000000000000000000;
-	letter[6]	=	0b10001000000000000000000000000000;
-	letter[7]	=	0b00000000000000000000000000000000;
-	letter[8]	=	0b00000000000000000000000000000000;
-	letter[9]	=	0b00000000000000000000000000000000;
-	letter[10]	=	0b00000000000000000000000000000000;
-	letter[11]	=	0b00000000000000000000000000000000;
-	letter[12]	=	0b00000000000000000000000000000000;
-	letter[13]	=	0b00000000000000000000000000000000;
-	letter[14]	=	0b00000000000000000000000000000000;
-	letter[15]	=	0b00000000000000000000000000000000;
+	// Local variables
+	uint32_t barx, bary;
+	int f, ddF_x, ddF_y, x, y, P;
 
-	int R, P;
-	for(P = 0; P < DISP__COLOR_DEPTH; P++)
+	// Take absolute value of radius
+	if (radius < 0) radius = 0 - radius;	// Efficient absolute value
+
+	// Initialize variables
+	f = 1 - radius;
+	ddF_x = 1;
+	ddF_y = -2 * radius;
+	x = 0;
+	y = radius;
+
+	// Limit dimensions
+	if((Y - radius > (DISP__NUM_ROWS - 1)) || (Y + radius < 0)) return;			// Circle is completely off screen, so nothing to draw
+	if((X - radius > (DISP__NUM_COLUMNS - 1)) || (X + radius < 0)) return;			// Circle is completely off screen, so nothing to draw
+
+	// Build circle from bar
+	while(x<y)
 	{
-		for(R = 0; R < DISP__NUM_ROWS; R++)
+		if(f >= 0)
 		{
-			if(textColor->red & BIT(P)) buf->redRow[R][P] |= letter[R];
-			else buf->redRow[R][P] &= ~letter[R];
+			y--;
+			ddF_y += 2;
+			f += ddF_y;
+		}
+		x++;
+		ddF_x += 2;
+		f += ddF_x;
 
-			if(textColor->green & BIT(P)) buf->greenRow[R][P] |= letter[R];
-			else buf->greenRow[R][P] &= ~letter[R];
+		// Create bars to draw
+		bary = 0xFFFFFFFF & ~(0xFFFFFFFF >> X + x + 1);
+		bary &= ~(0xFFFFFFFF << (DISP__NUM_COLUMNS - X + x - 1));
+		barx = 0xFFFFFFFF & ~(0xFFFFFFFF >> X + y + 1);
+		barx &= ~(0xFFFFFFFF << (DISP__NUM_COLUMNS - X + y - 1));
 
-			if(textColor->blue & BIT(P)) buf->blueRow[R][P] |= letter[R];
-			else buf->blueRow[R][P] &= ~letter[R];
+		// Set indices
+		int Ypy = Y + y;
+		int Ymy = Y - y + 1;
+		int Ypx = Y + x;
+		int Ymx = Y - x + 1;
+		// Now draw bars
+		for(P = 0; P < DISP__COLOR_DEPTH; P++)
+		{
+			if(color->red & BIT(P))
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->redRow[Ypy][P] |= bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->redRow[Ymy][P] |= bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->redRow[Ypx][P] |= barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->redRow[Ymx][P] |= barx;
+			}
+			else
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->redRow[Ypy][P] &= ~bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->redRow[Ymy][P] &= ~bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->redRow[Ypx][P] &= ~barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->redRow[Ymx][P] &= ~barx;
+			}
+
+			if(color->green & BIT(P))
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->greenRow[Ypy][P] |= bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->greenRow[Ymy][P] |= bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->greenRow[Ypx][P] |= barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->greenRow[Ymx][P] |= barx;
+			}
+			else
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->greenRow[Ypy][P] &= ~bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->greenRow[Ymy][P] &= ~bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->greenRow[Ypx][P] &= ~barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->greenRow[Ymx][P] &= ~barx;
+			}
+
+			if(color->blue & BIT(P))
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->blueRow[Ypy][P] |= bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->blueRow[Ymy][P] |= bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->blueRow[Ypx][P] |= barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->blueRow[Ymx][P] |= barx;
+			}
+			else
+			{
+				if( Ypy >= 0 && Ypy < DISP__NUM_ROWS)	buf->blueRow[Ypy][P] &= ~bary;
+				if( Ymy >= 0 && Ymy < DISP__NUM_ROWS)	buf->blueRow[Ymy][P] &= ~bary;
+				if( Ypx >= 0 && Ypx < DISP__NUM_ROWS)	buf->blueRow[Ypx][P] &= ~barx;
+				if( Ymx >= 0 && Ymx < DISP__NUM_ROWS)	buf->blueRow[Ymx][P] &= ~barx;
+			}
+		}
+	}
+}
+
+void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, char alphNum[], int length, int space, int X, int Y)
+{
+	// Limit X & Y range
+	if(X >= DISP__NUM_COLUMNS) 	X = DISP__NUM_COLUMNS - 1;
+	if(X < 0)	X = 0;
+	if(Y >= DISP__NUM_ROWS) 	Y = DISP__NUM_ROWS - 1;
+	if(Y < 0)	Y = 0;
+
+	// Make sure length is valid
+	if(length <= 0) return;	// Error, length invalid
+
+	uint32_t bar;
+	int R, P, ii, jj, offset;
+	for(R = Y; R < Y + 7; R++)
+	{
+		ii = R - Y;
+		bar = 0;
+		offset = -1;
+		for(jj = 0; jj < length; jj ++)
+		{
+			offset += space + 5;
+			bar |= (unsigned) (charMap[alphNum[jj]][ii]) << (DISP__NUM_COLUMNS - X - offset);
+		}
+
+		for(P = 0; P < DISP__COLOR_DEPTH; P++)
+		{
+			if(textColor->red & BIT(P)) buf->redRow[R][P] |= bar;
+			else buf->redRow[R][P] &= ~bar;
+
+			if(textColor->green & BIT(P)) buf->greenRow[R][P] |= bar;
+			else buf->greenRow[R][P] &= ~bar;
+
+			if(textColor->blue & BIT(P)) buf->blueRow[R][P] |= bar;
+			else buf->blueRow[R][P] &= ~bar;
 		}
 	}
 
@@ -474,7 +876,7 @@ void DISP__fillScreen(DISP__imgBuf *buf, const DISP__PDMcolor *color)
 		for(R = 0; R < DISP__NUM_ROWS; R++)
 		{
 			buf->redRow[R][P] = 		(color->red & BIT(P)) 	? 	0xFFFFFFFF : 0x00000000;
-			buf->greenRow[R][P] = 		(color->green & BIT(P)) 	? 	0xFFFFFFFF : 0x00000000;
+			buf->greenRow[R][P] = 		(color->green & BIT(P)) ? 	0xFFFFFFFF : 0x00000000;
 			buf->blueRow[R][P] = 		(color->blue & BIT(P)) 	?	0xFFFFFFFF : 0x00000000;
 		}
 	}

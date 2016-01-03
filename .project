@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>DisplayDriver</name>
+	<name>MSP432_16x32_RGB_Display</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -24,10 +24,4 @@
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
-	<variableList>
-		<variable>
-			<name>MSPWAREDLIB_ROOT</name>
-			<value>file:/C:/ti/msp430/MSPWare_2_40_00_37/driverlib/driverlib/MSP432P4xx</value>
-		</variable>
-	</variableList>
 </projectDescription>
