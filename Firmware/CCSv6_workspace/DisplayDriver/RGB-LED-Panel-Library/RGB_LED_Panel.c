@@ -824,7 +824,7 @@ void DISP__fillCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int
 	}
 }
 
-void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, char alphNum, int X, int Y)
+void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, char alphNum[], int length, int space, int X, int Y)
 {
 	// Limit X & Y range
 	if(X >= DISP__NUM_COLUMNS) 	X = DISP__NUM_COLUMNS - 1;
@@ -832,23 +832,32 @@ void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, char alp
 	if(Y >= DISP__NUM_ROWS) 	Y = DISP__NUM_ROWS - 1;
 	if(Y < 0)	Y = 0;
 
-	// Shift ASCII value to match charMap, since charMap starts at the 32nd ASCII value
-	alphNum -= 32;
+	// Make sure length is valid
+	if(length <= 0) return;	// Error, length invalid
 
-	int R, P;
-	for(P = 0; P < DISP__COLOR_DEPTH; P++)
+	uint32_t bar;
+	int R, P, ii, jj, offset;
+	for(R = Y; R < Y + 7; R++)
 	{
-		for(R = Y; R < Y + 7; R++)
+		ii = R - Y;
+		bar = 0;
+		offset = -1;
+		for(jj = 0; jj < length; jj ++)
 		{
-			int index = R - Y;
-			if(textColor->red & BIT(P)) buf->redRow[R][P] |= (unsigned) (charMap[alphNum][index] << (DISP__NUM_COLUMNS - X - 5));
-			else buf->redRow[R][P] &= ~((unsigned) (charMap[alphNum][index] << (DISP__NUM_COLUMNS - X - 5)));
+			offset += space + 5;
+			bar |= (unsigned) (charMap[alphNum[jj]][ii]) << (DISP__NUM_COLUMNS - X - offset);
+		}
 
-			if(textColor->green & BIT(P)) buf->greenRow[R][P] |= (unsigned) (charMap[alphNum][index] << (DISP__NUM_COLUMNS - X - 5));
-			else buf->greenRow[R][P] &= ~((unsigned) (charMap[alphNum][index] << (DISP__NUM_COLUMNS - X - 5)));
+		for(P = 0; P < DISP__COLOR_DEPTH; P++)
+		{
+			if(textColor->red & BIT(P)) buf->redRow[R][P] |= bar;
+			else buf->redRow[R][P] &= ~bar;
 
-			if(textColor->blue & BIT(P)) buf->blueRow[R][P] |= (unsigned) (charMap[alphNum][index] << (DISP__NUM_COLUMNS - X - 5));
-			else buf->blueRow[R][P] &= ~((unsigned) (charMap[alphNum][index] << (DISP__NUM_COLUMNS - X - 5)));
+			if(textColor->green & BIT(P)) buf->greenRow[R][P] |= bar;
+			else buf->greenRow[R][P] &= ~bar;
+
+			if(textColor->blue & BIT(P)) buf->blueRow[R][P] |= bar;
+			else buf->blueRow[R][P] &= ~bar;
 		}
 	}
 

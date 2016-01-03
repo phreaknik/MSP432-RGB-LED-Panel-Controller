@@ -101,7 +101,7 @@ extern void DISP__drawRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X
 extern void DISP__fillRect(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int width, int height);
 extern void DISP__drawCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int radius);
 extern void DISP__fillCircle(DISP__imgBuf *buf, const DISP__PDMcolor *color, int X, int Y, int radius);
-extern void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, const char alphNum, int X, int Y);
+extern void DISP__drawChar(DISP__imgBuf *buf, const DISP__PDMcolor *textColor, char alphNum[], int length, int space, int X, int Y);
 extern void DISP__drawScreen(const DISP__imgBuf *buf);
 extern void DISP__fillScreen(DISP__imgBuf *buf, const DISP__PDMcolor *PDMColor);
 extern void DISP__setColorPDM(DISP__PDMcolor *PDMcolor, const int32_t red, const int32_t green, const int32_t blue);
